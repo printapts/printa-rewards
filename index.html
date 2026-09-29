@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#111827">
+<title>Printa | مميزاتك بتكبر معاك</title>
+<style>
+:root{--navy:#111827;--navy2:#182338;--yellow:#ffd43b;--pink:#ff78a8;--green:#58dfc0;--blue:#74c4ff;--white:#fff;--muted:#d7dfeb}
+*{box-sizing:border-box} body{margin:0;background:#0b1220;color:#fff;font-family:Tahoma,Arial,sans-serif}
+.app{max-width:520px;margin:auto;min-height:100vh;padding:20px 15px 35px;background:radial-gradient(circle at 50% 0,#26334d 0,#111a2b 38%,#0b1220 100%)}
+.brand{font-size:44px;font-weight:900;letter-spacing:-2px}.brand span{color:var(--yellow)} .tag{opacity:.72;margin-top:-5px}
+.hero{text-align:center;padding:20px 8px 16px}.mascot{font-size:66px}.hero h1{font-size:30px;line-height:1.45;margin:9px 0}.hero h1 em{font-style:normal;color:var(--yellow)}
+.hero p{margin:8px auto;max-width:430px;line-height:1.85;color:var(--muted);font-size:16px}
+.hint{display:inline-block;background:#ffffff12;border:1px solid #ffffff1e;border-radius:999px;padding:9px 14px;margin-top:8px;font-size:13px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-top:10px}
+.card{border:0;border-radius:24px;min-height:178px;padding:18px 14px;text-align:right;color:#121722;font-family:inherit;cursor:pointer;box-shadow:0 9px 24px #0005;transition:.15s}
+.card:hover{transform:translateY(-2px)}.card:active{transform:scale(.97)} .ico{font-size:41px}.card h2{margin:7px 0;font-size:20px}.card p{margin:0;font-size:13.5px;line-height:1.65}
+.points{background:linear-gradient(145deg,#ffbad1,#ff77a8)}.ranks{background:linear-gradient(145deg,#ffeb96,#ffca39)}
+.ref{background:linear-gradient(145deg,#b0f5e8,#58dabc)}.how{background:linear-gradient(145deg,#c0e8ff,#73c3ff)}
+.benefits{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin:18px 0 4px}.benefits span{background:#ffffff0d;border:1px solid #ffffff18;padding:8px 10px;border-radius:999px;font-size:12px;color:#dbe5f3}.footer{text-align:center;color:#9eacc0;font-size:12px;margin-top:23px}
+.page{display:none}.page.active{display:block}.home.hidden{display:none}
+.back{position:sticky;top:10px;z-index:10;backdrop-filter:blur(10px);border:1px solid #ffffff25;background:#ffffff12;color:#fff;padding:10px 15px;border-radius:14px;font:bold 14px Tahoma;cursor:pointer}
+.panel{margin-top:17px;background:#fff;color:#172033;border-radius:27px;padding:23px;box-shadow:0 13px 35px #0006}
+.panel h1{font-size:28px;margin:5px 0 8px}.panel h3{margin-bottom:5px}.panel p,.panel li{line-height:1.9}.bigicon{text-align:center;font-size:70px}
+.callout{border-radius:18px;padding:15px;margin:15px 0;background:#f1f5f9;font-weight:bold;line-height:1.8}
+.reward{display:flex;align-items:center;justify-content:space-between;padding:13px 14px;margin:8px 0;border-radius:16px;background:#f6f7f9}
+.reward b{font-size:18px}.reward strong{font-size:20px;color:#e94277}
+.cycle{text-align:center;background:#fff3c4;border-radius:17px;padding:14px;margin-top:13px;font-weight:bold;line-height:1.8}
+.rankline{display:flex;align-items:center;justify-content:space-between;padding:12px 13px;margin:7px 0;background:#f5f6f8;border-radius:14px;font-weight:bold}
+.legend{background:#fff1ad;border-radius:20px;padding:18px;text-align:center;margin-top:15px}.legend .price{font-size:38px;font-weight:900;color:#9b6b00}
+.small{font-size:12.5px;color:#667085;line-height:1.7}.bottomBack{width:100%;margin-top:22px;border:0;border-radius:16px;padding:14px;background:#182338;color:#fff;font:bold 15px Tahoma;cursor:pointer}.bottomBack:active{transform:scale(.98)}.steps{counter-reset:s}
+.step{position:relative;background:#f4f7fa;border-radius:17px;padding:15px 15px 15px 45px;margin:9px 0;line-height:1.7}
+.step:before{counter-increment:s;content:counter(s);position:absolute;left:14px;top:14px;width:25px;height:25px;border-radius:50%;display:grid;place-items:center;background:#182338;color:#fff;font-weight:bold}
+.flow{font-size:17px;text-align:center;line-height:2.2;font-weight:bold}
+
+.mascotBox{display:flex;justify-content:center;margin:8px 0 4px}
+.printaMascot{position:relative;width:92px;height:112px;background:linear-gradient(145deg,#fff,#eef3f8);border-radius:14px 14px 18px 18px;box-shadow:0 10px 22px #0004;transform:rotate(-3deg)}
+.printaMascot:before{content:"";position:absolute;right:0;top:0;border-style:solid;border-width:0 0 22px 22px;border-color:transparent transparent #dbe4ef transparent}
+.eye{position:absolute;top:37px;width:9px;height:13px;background:#172033;border-radius:50%}.eye.l{right:27px}.eye.r{left:27px}
+.smile{position:absolute;top:61px;left:35px;width:24px;height:12px;border-bottom:3px solid #172033;border-radius:0 0 20px 20px}
+.arm{position:absolute;top:62px;width:28px;height:6px;background:#172033;border-radius:8px}.arm.a1{right:-21px;transform:rotate(-25deg)}.arm.a2{left:-21px;transform:rotate(25deg)}
+.hand{position:absolute;font-size:20px;top:48px}.hand.h1{right:-36px}.hand.h2{left:-36px}
+.dotlogo{position:absolute;bottom:13px;left:32px;font-size:16px;letter-spacing:-5px}
+.mascotMini{transform:scale(.78);margin:-5px auto -12px}
+</style>
+</head>
+<body><main class="app">
+<section id="home" class="home">
+ <div class="brand">Pr<span>i</span>nta</div><div class="tag">مطبعة برينتا</div>
+ <div class="hero">
+  <div class="mascotBox"><div class="printaMascot"><span class="eye l"></span><span class="eye r"></span><span class="smile"></span><span class="arm a1"></span><span class="arm a2"></span><span class="hand h1">👍</span><span class="hand h2">📄</span><span class="dotlogo">🔵🟡🔴</span></div></div>
+  <h1>بتطبع عندنا؟<br>يبقى لازم تعرف إن <em>ليك مميزات 😉</em></h1>
+  <p>كل مرة تطبع فيها بتتحسبلك… <b>وبتقربك من سعر أقل 💛</b></p>
+  <div class="hint">دوس على أي حاجة تحت واعرف بتستفيد منها إزاي 👇</div>
+ </div>
+ <div class="grid">
+  <button class="card points" onclick="openPage('points')"><div class="ico">🎁</div><h2>نظام النقاط</h2><p>كل 100 ورقة = نقطة، وكل ما تجمع أكتر مكافأتك تكبر.</p></button>
+  <button class="card ranks" onclick="openPage('ranks')"><div class="ico">👑</div><h2>نظام الرتب</h2><p>كل ما تطبع أكتر، رتبتك بتعلى وسعر طباعة الوجه الواحد بيقل.</p></button>
+  <button class="card ref" onclick="openPage('ref')"><div class="ico">📣</div><h2>أكواد الإحالة</h2><p>صاحبك بيوفر… وإنت بتجمع نقاط حتى وإنت مش بتطبع.</p></button>
+  <button class="card how" onclick="openPage('how')"><div class="ico">🔥</div><h2>يعني هستفيد بإيه؟</h2><p>شوف النظام كله في كام ثانية واعرف إزاي المميزات بتكمل بعض.</p></button>
+ </div>
+ <div class="benefits"><span>🎁 خصومات متكررة</span><span>👑 سعر أقل مع الرتبة</span><span>📣 نقاط من الإحالة</span></div><div class="footer">🖨️ Printa — كل تعامل ليك بيتحسب ❤️</div>
+</section>
+
+<section id="points" class="page">
+<button class="back" onclick="goHome()">← الرئيسية</button>
+<div class="panel">
+ <div class="bigicon">🎁</div><div class="mascotBox"><div class="printaMascot"><span class="eye l"></span><span class="eye r"></span><span class="smile"></span><span class="arm a1"></span><span class="arm a2"></span><span class="hand h1">🎁</span><span class="hand h2"></span><span class="dotlogo">🔵🟡🔴</span></div></div><h1>طب والنقاط دي بتعمل إيه؟</h1>
+ <p>وإنت بتطبع عندنا، بتجمع نقاط على حسابك. والنقاط دي مش للمنظر 😄 <b>بتقدر تستفيد بيها في خصومات على أوردراتك.</b></p>
+ <div class="callout">📄 كل <b>100 ورقة</b> بتطبعها = <b>نقطة واحدة</b></div>
+ <div class="reward"><b>10 نقاط</b><strong>خصم 10%</strong></div>
+ <div class="reward"><b>20 نقطة</b><strong>خصم 15%</strong></div>
+ <div class="reward"><b>30 نقطة</b><strong>خصم 20% 🔥</strong></div>
+ <p class="small">كل خصم بيتطبق على أوردر واحد عند وصولك للمرحلة.</p>
+ <div class="cycle">🔄 والمكافآت مش مرة وخلاص ❤️<br>40 نقطة = 10% &nbsp;•&nbsp; 50 = 15% &nbsp;•&nbsp; 60 = 20%<br>وبعدها نفس الدورة بتتكرر.</div>
+ <h3>مثال سريع 👇</h3><p>طبعت 1000 ورقة على فترات؟ كده وصلت لـ10 نقاط، واتفتح لك <b>خصم 10%</b> على أوردر واحد 🎉</p>
+<button class="bottomBack" onclick="goHome()">🏠 العودة للرئيسية</button></div></section>
+
+<section id="ranks" class="page">
+<button class="back" onclick="goHome()">← الرئيسية</button>
+<div class="panel">
+ <div class="bigicon">👑</div><div class="mascotBox"><div class="printaMascot"><span class="eye l"></span><span class="eye r"></span><span class="smile"></span><span class="arm a1"></span><span class="arm a2"></span><span class="hand h1">👑</span><span class="hand h2"></span><span class="dotlogo">🔵🟡🔴</span></div></div><h1>يعني إيه رتب؟</h1>
+ <p>الموضوع بسيط 😄 كل ما تطبع عندنا أكتر، <b>رتبتك بتعلى</b>. وكل ما رتبتك تعلى، <b>سعر الورقة بيقل 💰</b></p>
+ <p><b>يعني طباعتك النهارده بتقربك من سعر أحسن المرة الجاية ❤️</b></p>
+ <div class="rankline"><span>⭐ عميل جديد</span><span>البداية</span></div>
+ <div class="rankline"><span>🌟 عميل نشيط</span><span>⬆️</span></div>
+ <div class="rankline"><span>💙 عميل دائم</span><span>⬆️</span></div>
+ <div class="rankline"><span>🏅 عميل متميز</span><span>⬆️</span></div>
+ <div class="rankline"><span>🥉 عميل برونزي</span><span>⬆️</span></div>
+ <div class="rankline"><span>🥈 عميل فضي</span><span>⬆️</span></div>
+ <div class="rankline"><span>🥇 عميل ذهبي</span><span>⬆️</span></div>
+ <div class="rankline"><span>🏆 أسطورة</span><span>أفضل سعر</span></div>
+ <div class="legend"><div>سعر طباعة الوجه الواحد يبدأ من</div><div class="price">1 جنيه</div><div>ويقل مع رتبتك… ولحد <b>60 قرش</b> لرتبة الأسطورة 🏆</div></div>
+ <p class="small">* الأسعار المذكورة خاصة بطباعة الوجه الواحد.</p>
+<button class="bottomBack" onclick="goHome()">🏠 العودة للرئيسية</button></div></section>
+
+<section id="ref" class="page">
+<button class="back" onclick="goHome()">← الرئيسية</button>
+<div class="panel">
+ <div class="bigicon">📣</div><div class="mascotBox"><div class="printaMascot"><span class="eye l"></span><span class="eye r"></span><span class="smile"></span><span class="arm a1"></span><span class="arm a2"></span><span class="hand h1">📣</span><span class="hand h2"></span><span class="dotlogo">🔵🟡🔴</span></div></div><h1>عندك صاحب بيطبع كتير؟</h1>
+ <p>اديله <b>كود الإحالة بتاعك</b> وخليه يستخدمه عندنا.</p>
+ <div class="step">صاحبك يسجل عندنا بكودك.</div>
+ <div class="step">أول أوردر ليه ياخد عليه <b>خصم 10% 🎁</b></div>
+ <div class="step">بعد كده، كل ما صاحبك يجمع <b>نقطة واحدة</b>، إنت يزيد لك <b>ربع نقطة</b>.</div>
+ <div class="callout">😎 يعني رصيدك ممكن يزيد عندنا <b>من غير حتى ما تطبع!</b></div>
+ <h3>مثال سريع 👇</h3><p>لو صاحبك جمع 4 نقاط، حسابك يزيد <b>نقطة كاملة</b> من الإحالة.</p>
+ <div class="cycle">❤️ صاحبك بيوفر… وإنت بتجمع نقاط.</div>
+<button class="bottomBack" onclick="goHome()">🏠 العودة للرئيسية</button></div></section>
+
+<section id="how" class="page">
+<button class="back" onclick="goHome()">← الرئيسية</button>
+<div class="panel">
+ <div class="bigicon">🔥</div><div class="mascotBox"><div class="printaMascot"><span class="eye l"></span><span class="eye r"></span><span class="smile"></span><span class="arm a1"></span><span class="arm a2"></span><span class="hand h1">👌</span><span class="hand h2"></span><span class="dotlogo">🔵🟡🔴</span></div></div><h1>يعني ممكن أستفيد بإيه؟</h1>
+ <div class="flow">
+  🖨️ بتطبع<br>↓<br>
+  🎁 بتجمع نقاط وخصومات<br>↓<br>
+  👑 رتبتك بتعلى وسعر الوجه الواحد بيقل<br>↓<br>
+  📣 أصحابك يستخدموا كودك<br>↓<br>
+  😎 نقاطك تزيد حتى وإنت مش بتطبع
+ </div>
+ <div class="callout">كل نظام بيكمل التاني… وكل تعامل ليك مع Printa بيقربك من ميزة جديدة ❤️</div>
+<button class="bottomBack" onclick="goHome()">🏠 العودة للرئيسية</button></div></section>
+</main>
+<script>
+function openPage(id){document.getElementById('home').classList.add('hidden');document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));document.getElementById(id).classList.add('active');scrollTo({top:0,behavior:'smooth'})}
+function goHome(){document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));document.getElementById('home').classList.remove('hidden');scrollTo({top:0,behavior:'smooth'})}
+// زر Back في الموبايل يرجع للرئيسية أولًا بدل الخروج مباشرة
+window.addEventListener('popstate', function(){
+  const active=document.querySelector('.page.active');
+  if(active){goHome();}
+});
+const oldOpen=openPage;
+openPage=function(id){history.pushState({section:id},'', '#'+id);oldOpen(id);}
+const oldHome=goHome;
+goHome=function(){document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));document.getElementById('home').classList.remove('hidden');if(location.hash) history.replaceState({},'',location.pathname);scrollTo({top:0,behavior:'smooth'});}
+</script></body></html>
