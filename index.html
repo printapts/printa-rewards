@@ -53,8 +53,8 @@
 </section>
 
 <section id="account" class="page"><button class="back" onclick="goHome()">← الرئيسية</button><div class="panel">
-<div class="bigicon">👤</div><h1>حسابي في Printa</h1><p>اكتب كود العميل واعرف بيانات حسابك الحالية.</p>
-<div class="lookup"><input id="customerCode" placeholder="مثال: TEST001" autocomplete="off"><button onclick="findCustomer()">عرض حسابي</button></div>
+<div class="bigicon">👤</div><h1>حسابي في Printa</h1><p>اكتب رقم الموبايل المسجل عندنا واعرف بيانات حسابك الحالية.</p>
+<div class="lookup"><input id="customerPhone" placeholder="مثال: 01000000000" inputmode="numeric" autocomplete="tel" dir="ltr" maxlength="11"><button onclick="findCustomer()">عرض حسابي</button></div>
 <div id="accountStatus" class="status"></div><div id="customerProfile" class="profile">
 <div class="callout" id="welcome"></div>
 <div class="stat"><b>👑 رتبتك</b><strong id="rank"></strong></div><div class="stat"><b>🎁 نقاطك</b><strong id="pointsValue"></strong></div>
@@ -78,34 +78,34 @@ function openPage(id){document.getElementById('home').classList.add('hidden');do
 function goHome(){document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));document.getElementById('home').classList.remove('hidden');if(location.hash)history.replaceState({},'',location.pathname);scrollTo({top:0,behavior:'smooth'})}
 window.addEventListener('popstate',()=>{if(document.querySelector('.page.active'))goHome()});
 
+function normalizePhone(value){
+ const arabic='٠١٢٣٤٥٦٧٨٩',persian='۰۱۲۳۴۵۶۷۸۹';
+ return value.trim().replace(/[٠-٩]/g,d=>String(arabic.indexOf(d))).replace(/[۰-۹]/g,d=>String(persian.indexOf(d))).replace(/\D/g,'');
+}
+function enNum(v,o={}){return Number(v||0).toLocaleString('en-US',o)}
 async function findCustomer(){
- const code=document.getElementById('customerCode').value.trim().toUpperCase();
+ const phone=normalizePhone(document.getElementById('customerPhone').value);
  const status=document.getElementById('accountStatus'),profile=document.getElementById('customerProfile');
  profile.classList.remove('show');
- if(!code){status.textContent='اكتب كود العميل الأول 😊';return}
+ if(!phone){status.textContent='اكتب رقم الموبايل الأول 😊';return}
+ if(!/^01\d{9}$/.test(phone)){status.textContent='راجع رقم الموبايل — لازم يكون 11 رقم ويبدأ بـ 01.';return}
  status.textContent='جاري تحميل حسابك…';
  try{
-  const url=SUPABASE_URL+'/rest/v1/customers?customer_code=eq.'+encodeURIComponent(code)+'&select=customer_name,total_sheets,points,rank_name,current_price,sheets_to_next,discount_rate,discount_available';
+  const url=SUPABASE_URL+'/rest/v1/customers?phone=eq.'+encodeURIComponent(phone)+'&select=customer_name,total_sheets,points,rank_name,current_price,sheets_to_next,discount_rate,discount_available&limit=1';
   const r=await fetch(url,{headers:{apikey:SUPABASE_KEY}});
-  if(!r.ok){
-    const body = await r.text();
-    throw new Error('HTTP '+r.status+' — '+body);
-  }
+  if(!r.ok)throw new Error();
   const rows=await r.json();
-  if(!rows.length){status.textContent='الكود ده مش موجود. راجع الكود وجرب تاني.';return}
+  if(!rows.length){status.textContent='رقم الموبايل ده مش مسجل عندنا. راجع الرقم وجرب تاني.';return}
   const x=rows[0];status.textContent='';
   document.getElementById('welcome').textContent='أهلاً '+x.customer_name+' 👋';
   document.getElementById('rank').textContent=x.rank_name||'—';
-  document.getElementById('pointsValue').textContent=Number(x.points||0).toLocaleString('ar-EG');
-  document.getElementById('sheets').textContent=Number(x.total_sheets||0).toLocaleString('ar-EG')+' ورقة';
-  document.getElementById('price').textContent=Number(x.current_price||0).toLocaleString('ar-EG',{maximumFractionDigits:2})+' جنيه';
-  document.getElementById('next').textContent=Number(x.sheets_to_next||0).toLocaleString('ar-EG')+' ورقة';
-  document.getElementById('discount').textContent=x.discount_available?(Number(x.discount_rate||0).toLocaleString('ar-EG')+'%'):'لا يوجد حاليًا';
+  document.getElementById('pointsValue').textContent=enNum(x.points);
+  document.getElementById('sheets').textContent=enNum(x.total_sheets)+' ورقة';
+  document.getElementById('price').textContent=enNum(x.current_price,{maximumFractionDigits:2})+' جنيه';
+  document.getElementById('next').textContent=enNum(x.sheets_to_next)+' ورقة';
+  document.getElementById('discount').textContent=x.discount_available?(enNum(x.discount_rate)+'%'):'لا يوجد حاليًا';
   profile.classList.add('show');
- }catch(e){
-   status.innerHTML='<b>خطأ الاتصال:</b><br><span style="font-size:12px;direction:ltr;display:block;word-break:break-all;margin-top:8px">'+
-     String(e.message || e)+'</span>';
- }
+ }catch(e){status.textContent='حصلت مشكلة في الاتصال. جرب تاني بعد شوية.'}
 }
-document.getElementById('customerCode').addEventListener('keydown',e=>{if(e.key==='Enter')findCustomer()});
+document.getElementById('customerPhone').addEventListener('keydown',e=>{if(e.key==='Enter')findCustomer()});
 </script></body></html>
