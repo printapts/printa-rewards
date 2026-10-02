@@ -91,8 +91,8 @@ async function findCustomer(){
  if(!/^01\d{9}$/.test(phone)){status.textContent='راجع رقم الموبايل — لازم يكون 11 رقم ويبدأ بـ 01.';return}
  status.textContent='جاري تحميل حسابك…';
  try{
-  const url=SUPABASE_URL+'/rest/v1/customers?phone=eq.'+encodeURIComponent(phone)+'&select=customer_name,total_sheets,points,rank_name,current_price,sheets_to_next,discount_rate,discount_available&limit=1';
-  const r=await fetch(url,{headers:{apikey:SUPABASE_KEY}});
+  const url=SUPABASE_URL+'/rest/v1/rpc/get_customer_by_phone';
+  const r=await fetch(url,{method:'POST',headers:{apikey:SUPABASE_KEY,'Content-Type':'application/json'},body:JSON.stringify({p_phone:phone})});
   if(!r.ok)throw new Error();
   const rows=await r.json();
   if(!rows.length){status.textContent='رقم الموبايل ده مش مسجل عندنا. راجع الرقم وجرب تاني.';return}
