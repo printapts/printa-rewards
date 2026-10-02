@@ -87,7 +87,10 @@ async function findCustomer(){
  try{
   const url=SUPABASE_URL+'/rest/v1/customers?customer_code=eq.'+encodeURIComponent(code)+'&select=customer_name,total_sheets,points,rank_name,current_price,sheets_to_next,discount_rate,discount_available';
   const r=await fetch(url,{headers:{apikey:SUPABASE_KEY}});
-  if(!r.ok)throw new Error();
+  if(!r.ok){
+    const body = await r.text();
+    throw new Error('HTTP '+r.status+' — '+body);
+  }
   const rows=await r.json();
   if(!rows.length){status.textContent='الكود ده مش موجود. راجع الكود وجرب تاني.';return}
   const x=rows[0];status.textContent='';
@@ -99,7 +102,10 @@ async function findCustomer(){
   document.getElementById('next').textContent=Number(x.sheets_to_next||0).toLocaleString('ar-EG')+' ورقة';
   document.getElementById('discount').textContent=x.discount_available?(Number(x.discount_rate||0).toLocaleString('ar-EG')+'%'):'لا يوجد حاليًا';
   profile.classList.add('show');
- }catch(e){status.textContent='حصلت مشكلة في الاتصال. جرّب تاني بعد شوية.'}
+ }catch(e){
+   status.innerHTML='<b>خطأ الاتصال:</b><br><span style="font-size:12px;direction:ltr;display:block;word-break:break-all;margin-top:8px">'+
+     String(e.message || e)+'</span>';
+ }
 }
 document.getElementById('customerCode').addEventListener('keydown',e=>{if(e.key==='Enter')findCustomer()});
 </script></body></html>
