@@ -345,6 +345,15 @@ async function prAddServerAttempts(amount){
  if(!r.ok)throw new Error('add_attempts');
  tries=Number(await r.json())||0; updateAttempts(); return tries;
 }
+async function prRefreshServerAttempts(){
+ const r=await fetch(PR_SB_URL+'/rest/v1/rpc/get_game_attempts',{method:'POST',
+  headers:{apikey:PR_SB_KEY,'Content-Type':'application/json'},
+  body:JSON.stringify({p_phone:prCurrentPhone})});
+ if(!r.ok)throw new Error('get_attempts');
+ tries=Number(await r.json())||0;
+ updateAttempts();
+ return tries;
+}
 async function prGameLogin(){
  const phone=prNormPhone(document.getElementById('prGamePhone').value),st=document.getElementById('prLoginStatus'),b=document.getElementById('prGameLogin');
  if(!/^01\d{9}$/.test(phone)){st.textContent='راجع رقم الموبايل — لازم يكون 11 رقم ويبدأ بـ 01';return}
@@ -394,28 +403,30 @@ function pick(prizes=activePrizes()){
  return eligible[eligible.length-1].i;
 }
 function updateClaimCard(){
- const box=document.getElementById('claimSummary'),btn=document.getElementById('claimBtn');if(!box||!btn)return;
- const redeemable=wins.filter(p=>p.type!=='extra_attempt');
- if(!redeemable.length){box.textContent=wins.length?'مكاسبك كانت محاولات إضافية… كمل لعب 🎡':'لف العجلة الأول وشوف هتكسب إيه 😄';btn.disabled=true;return}
- const grouped=new Map();redeemable.forEach(p=>{if(!grouped.has(p.id))grouped.set(p.id,{p,count:0});grouped.get(p.id).count++});
- box.innerHTML=[...grouped.values()].map(x=>`${x.p.icon} ${x.p.fullName}${x.count>1?` × ${x.count}`:''}`).join('<br>');btn.disabled=false;
+ const box=document.getElementById('claimList'),btn=document.getElementById('claimBtn');
+ if(!box||!btn)return;
+ const pending=wins.slice(prSentWinCount).filter(p=>p.type!=='extra_attempt'&&p.type!=='no_prize');
+ if(!pending.length){
+  box.textContent=wins.length?'مفيش مكاسب جديدة للإرسال دلوقتي ✅':'لف العجلة الأول وشوف هتكسب إيه 😄';
+  btn.disabled=true; return;
+ }
+ const grouped=new Map();
+ pending.forEach(p=>{if(!grouped.has(p.id))grouped.set(p.id,{p,count:0});grouped.get(p.id).count++});
+ box.innerHTML=[...grouped.values()].map(x=>`${x.p.icon} ${x.p.fullName}${x.count>1?` × ${x.count}`:''}`).join('<br>');
+ btn.disabled=false;
 }
 function sendPrintaWhatsApp(){
  const newWins=wins.slice(prSentWinCount);
  const redeemable=newWins.filter(p=>p.type!=='extra_attempt'&&p.type!=='no_prize');
- if(!redeemable.length){
-  const result=document.getElementById('result');
-  if(result)result.textContent='مفيش مكاسب جديدة للإرسال دلوقتي 🎁';
-  return;
- }
+ if(!redeemable.length){updateClaimCard();return}
  const grouped=new Map();
  redeemable.forEach(p=>{if(!grouped.has(p.id))grouped.set(p.id,{p,count:0});grouped.get(p.id).count++});
  const lines=[...grouped.values()].map(x=>`${x.p.icon} ${x.p.fullName}${x.count>1?` × ${x.count}`:''}`);
  const msg=['أهلاً برينتا 👋','أنا خلصت لعبة Printa 🎡','ومكاسبي الجديدة هي:',...lines,'','عايز أستلم مكاسبي 🎁'].join('\\n');
+ window.open('https://wa.me/201202662255?text='+encodeURIComponent(msg),'_blank','noopener');
  prSentWinCount=wins.length;
  prSaveGameState();
  updateClaimCard();
- window.open('https://wa.me/201202662255?text='+encodeURIComponent(msg),'_blank','noopener');
 }
 document.getElementById('claimBtn')?.addEventListener('click',sendPrintaWhatsApp);
 async async function spin(strength=.5){
@@ -437,14 +448,15 @@ async async function spin(strength=.5){
  prSpinSound(spinDuration,strength);setTimeout(prWinSound,spinDuration+20);
  setTimeout(async ()=>{
   if(prize.type==='extra_attempt'){
-   try{await prAddServerAttempts(prize.value)}
-   catch(e){
-    try{
-     const rr=await fetch(PR_SB_URL+'/rest/v1/rpc/get_game_attempts',{method:'POST',
-      headers:{apikey:PR_SB_KEY,'Content-Type':'application/json'},body:JSON.stringify({p_phone:prCurrentPhone})});
-     if(rr.ok)tries=Number(await rr.json())||0;
-    }catch(_){}
+   try{
+    await prAddServerAttempts(prize.value);
+    await prRefreshServerAttempts();
+   }catch(e){
+    try{await prRefreshServerAttempts()}catch(_){}
+    prize={id:'bonus-failed',shortName:'تعذر إضافة المحاولة',fullName:'تعذر إضافة المحاولة الإضافية — لم تُحتسب',icon:'⚠️',type:'no_prize',value:0,celebration:'none'};
    }
+  } else {
+   try{await prRefreshServerAttempts()}catch(_){}
   }
   if(['price','discount'].includes(prize.type))sessionWonIds.add(prize.id);
   if(prize.type!=='no_prize')wins.push(prize);
