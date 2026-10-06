@@ -419,7 +419,7 @@ function sendPrintaWhatsApp(){
  prSaveGameState();
 }
 document.getElementById('claimBtn')?.addEventListener('click',sendPrintaWhatsApp);
-async async function spin(strength=.5){
+async function spin(strength=.5){
  if(spinning||tries<=0)return;
  spinning=true;const btn=document.getElementById('btn');btn.disabled=true;
  const prizes=activePrizes(),index=pick(prizes),prize={...prizes[index]},step=360/prizes.length;
