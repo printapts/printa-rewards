@@ -406,7 +406,7 @@ function sendPrintaWhatsApp(){
  window.open('https://wa.me/201202662255?text='+encodeURIComponent(msg),'_blank','noopener');
 }
 document.getElementById('claimBtn')?.addEventListener('click',sendPrintaWhatsApp);
-async function spin(strength=.5){
+async async function spin(strength=.5){
  if(spinning||tries<=0)return;
  spinning=true;const btn=document.getElementById('btn');btn.disabled=true;
  try{
