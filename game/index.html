@@ -313,7 +313,7 @@ async function prLoadGameState(phone,name){
  prCurrentPhone=phone;
  let st=null;try{st=JSON.parse(localStorage.getItem(prStateKey())||'null')}catch(e){}
  wins=st&&Array.isArray(st.wins)?st.wins.map(id=>prizeConfig.find(x=>x.id===id)).filter(Boolean):[];
- prSentWinCount=st&&Number.isInteger(st.sentWinCount)?Math.max(0,Math.min(st.sentWinCount,wins.length)):0;
+ prSentWinCount=st&&Number.isInteger(st.sentWinCount)?Math.max(0,Math.min(st.sentWinCount,wins.length)):wins.length;
  sessionWonIds=new Set(st&&Array.isArray(st.premium)?st.premium:[]);
  const rr=await fetch(PR_SB_URL+'/rest/v1/rpc/get_game_attempts',{method:'POST',
   headers:{apikey:PR_SB_KEY,'Content-Type':'application/json'},body:JSON.stringify({p_phone:phone})});
@@ -329,30 +329,21 @@ async function prLoadGameState(phone,name){
  document.getElementById('btn').disabled=tries===0;
  document.getElementById('result').textContent=tries?('عندك '+tries+' محاولات… يلا!'):'مفيش محاولات متاحة حاليًا 🎡';
 }
-async function prConsumeServerAttempt(){
- const r=await fetch(PR_SB_URL+'/rest/v1/rpc/consume_game_attempt',{method:'POST',
-  headers:{apikey:PR_SB_KEY,'Content-Type':'application/json'},body:JSON.stringify({p_phone:prCurrentPhone})});
- if(!r.ok)throw new Error('consume');
+async function prPlayServerAttempt(bonus=0){
+ const r=await fetch(PR_SB_URL+'/rest/v1/rpc/play_game_attempt',{method:'POST',
+  headers:{apikey:PR_SB_KEY,'Content-Type':'application/json'},
+  body:JSON.stringify({p_phone:prCurrentPhone,p_bonus:bonus})});
+ if(!r.ok)throw new Error('play_attempt');
  const left=Number(await r.json());
  if(left<0)return false;
- tries=left;updateAttempts();return true;
-}
-async function prAddServerAttempts(amount){
- const n=Math.max(1,Math.floor(Number(amount)||0));
- const r=await fetch(PR_SB_URL+'/rest/v1/rpc/add_game_attempts',{method:'POST',
-  headers:{apikey:PR_SB_KEY,'Content-Type':'application/json'},
-  body:JSON.stringify({p_sync_key:'PRN-7x29-K4m8-2026',p_phone:prCurrentPhone,p_attempts:n})});
- if(!r.ok)throw new Error('add_attempts');
- tries=Number(await r.json())||0; updateAttempts(); return tries;
+ tries=left; updateAttempts(); return true;
 }
 async function prRefreshServerAttempts(){
  const r=await fetch(PR_SB_URL+'/rest/v1/rpc/get_game_attempts',{method:'POST',
   headers:{apikey:PR_SB_KEY,'Content-Type':'application/json'},
   body:JSON.stringify({p_phone:prCurrentPhone})});
  if(!r.ok)throw new Error('get_attempts');
- tries=Number(await r.json())||0;
- updateAttempts();
- return tries;
+ tries=Number(await r.json())||0; updateAttempts(); return tries;
 }
 async function prGameLogin(){
  const phone=prNormPhone(document.getElementById('prGamePhone').value),st=document.getElementById('prLoginStatus'),b=document.getElementById('prGameLogin');
@@ -432,38 +423,28 @@ document.getElementById('claimBtn')?.addEventListener('click',sendPrintaWhatsApp
 async async function spin(strength=.5){
  if(spinning||tries<=0)return;
  spinning=true;const btn=document.getElementById('btn');btn.disabled=true;
+ const prizes=activePrizes(),index=pick(prizes),prize={...prizes[index]},step=360/prizes.length;
+ const bonus=prize.type==='extra_attempt'?prize.value:0;
  try{
-  const ok=await prConsumeServerAttempt();
+  const ok=await prPlayServerAttempt(bonus);
   if(!ok){spinning=false;tries=0;updateAttempts();btn.disabled=true;document.getElementById('result').textContent='مفيش محاولات متاحة حاليًا 🎡';return}
  }catch(e){spinning=false;btn.disabled=false;document.getElementById('result').textContent='حصلت مشكلة في تسجيل المحاولة. جرّب تاني.';return}
- prSaveGameState();
- const prizes=activePrizes(),index=pick(prizes),prize={...prizes[index]},step=360/prizes.length;
  const target=(360-(index+.5)*step)%360,current=((rot%360)+360)%360,delta=(target-current+360)%360;
  const spinDuration=Math.round(3000+strength*2400);
- const fullTurns=3+Math.round(strength*4);const extraTurns=fullTurns*360;
- rot+=extraTurns+delta;
+ const fullTurns=3+Math.round(strength*4);rot+=fullTurns*360+delta;
  const wheel=document.getElementById('wheel');
  wheel.style.transition='transform '+spinDuration+'ms cubic-bezier(.12,.72,.16,1)';
  wheel.style.transform='rotate('+rot+'deg)';
  prSpinSound(spinDuration,strength);setTimeout(prWinSound,spinDuration+20);
- setTimeout(async ()=>{
-  if(prize.type==='extra_attempt'){
-   try{
-    await prAddServerAttempts(prize.value);
-    await prRefreshServerAttempts();
-   }catch(e){
-    try{await prRefreshServerAttempts()}catch(_){}
-    prize={id:'bonus-failed',shortName:'تعذر إضافة المحاولة',fullName:'تعذر إضافة المحاولة الإضافية — لم تُحتسب',icon:'⚠️',type:'no_prize',value:0,celebration:'none'};
-   }
-  } else {
-   try{await prRefreshServerAttempts()}catch(_){}
-  }
+ setTimeout(()=>{
   if(['price','discount'].includes(prize.type))sessionWonIds.add(prize.id);
   if(prize.type!=='no_prize')wins.push(prize);
   const history=document.getElementById('wins');history.replaceChildren();
   if(!wins.length)history.textContent='لسه ما كسبتش — جرّب حظك!';
-  else wins.forEach(p=>{const row=document.createElement('div');row.textContent=p.icon+' '+p.fullName;history.appendChild(row)});updateClaimCard();
-  showPrize(prize);if(prize.type==='no_prize')setTimeout(prNearMiss,80);else setTimeout(()=>prCelebration(prize.celebration||'normal'),80);updateAttempts();prSaveGameState();
+  else wins.forEach(p=>{const row=document.createElement('div');row.textContent=p.icon+' '+p.fullName;history.appendChild(row)});
+  updateClaimCard();showPrize(prize);
+  if(prize.type==='no_prize')setTimeout(prNearMiss,80);else setTimeout(()=>prCelebration(prize.celebration||'normal'),80);
+  updateAttempts();prSaveGameState();
   document.getElementById('result').textContent=(prize.type==='no_prize'?'':'🎉 كسبت ')+prize.icon+' '+prize.shortName+(tries?' — باقي '+tries+' محاولة':' — خلصت محاولاتك!');
   spinning=false;btn.disabled=tries===0;
  },spinDuration+100);
