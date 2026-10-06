@@ -304,7 +304,6 @@ function prNormPhone(v){
  return String(v||'').trim().replace(/[٠-٩]/g,d=>String(a.indexOf(d))).replace(/[۰-۹]/g,d=>String(p.indexOf(d))).replace(/\D/g,'');
 }
 function prStateKey(){return 'printa_game_'+prCurrentPhone}
-let prSentWinCount=0;
 function prSaveGameState(){
  if(!prCurrentPhone)return;
  localStorage.setItem(prStateKey(),JSON.stringify({premium:[...sessionWonIds]}));
@@ -313,28 +312,29 @@ async function prLoadGameState(phone,name){
  prCurrentPhone=phone;
  let st=null;try{st=JSON.parse(localStorage.getItem(prStateKey())||'null')}catch(e){}
  wins=[];
- prSentWinCount=st&&Number.isInteger(st.sentWinCount)?Math.max(0,Math.min(st.sentWinCount,wins.length)):wins.length;
  sessionWonIds=new Set(st&&Array.isArray(st.premium)?st.premium:[]);
  const rr=await fetch(PR_SB_URL+'/rest/v1/rpc/get_game_attempts',{method:'POST',
   headers:{apikey:PR_SB_KEY,'Content-Type':'application/json'},body:JSON.stringify({p_phone:phone})});
  if(!rr.ok)throw new Error('attempts');
- tries=Number(await rr.json())||0;
+ tries=prReadAttempts(await rr.json());
  document.getElementById('prPlayerName').textContent='👋 '+(name||'عميل Printa');
  document.getElementById('prPlayerPhone').textContent=phone;
  document.getElementById('prPhoneGate').classList.add('hide');
- const history=document.getElementById('wins');history.replaceChildren();
- if(!wins.length)history.textContent='لسه ما لعبتش';
- else wins.forEach(p=>{const row=document.createElement('div');row.textContent=p.icon+' '+p.fullName;history.appendChild(row)});
  updateClaimCard();updateAttempts();
  document.getElementById('btn').disabled=tries===0;
  document.getElementById('result').textContent=tries?('عندك '+tries+' محاولات… يلا!'):'مفيش محاولات متاحة حاليًا 🎡';
+}
+// The RPC atomically consumes one attempt and credits the bonus; never adjust tries locally.
+function prReadAttempts(value,allowEmpty=false){
+ if(!Number.isInteger(value)||value<(allowEmpty?-1:0))throw new Error('invalid_attempts');
+ return value;
 }
 async function prPlayServerAttempt(bonus=0){
  const r=await fetch(PR_SB_URL+'/rest/v1/rpc/play_game_attempt',{method:'POST',
   headers:{apikey:PR_SB_KEY,'Content-Type':'application/json'},
   body:JSON.stringify({p_phone:prCurrentPhone,p_bonus:bonus})});
  if(!r.ok)throw new Error('play_attempt');
- const left=Number(await r.json());
+ const left=prReadAttempts(await r.json(),true);
  if(left<0)return false;
  tries=left; updateAttempts(); return true;
 }
@@ -343,7 +343,7 @@ async function prRefreshServerAttempts(){
   headers:{apikey:PR_SB_KEY,'Content-Type':'application/json'},
   body:JSON.stringify({p_phone:prCurrentPhone})});
  if(!r.ok)throw new Error('get_attempts');
- tries=Number(await r.json())||0; updateAttempts(); return tries;
+ tries=prReadAttempts(await r.json()); updateAttempts(); return tries;
 }
 async function prGameLogin(){
  const phone=prNormPhone(document.getElementById('prGamePhone').value),st=document.getElementById('prLoginStatus'),b=document.getElementById('prGameLogin');
@@ -394,7 +394,7 @@ function pick(prizes=activePrizes()){
  return eligible[eligible.length-1].i;
 }
 function updateClaimCard(){
- const box=document.getElementById('claimList'),btn=document.getElementById('claimBtn');
+ const box=document.getElementById('claimSummary'),btn=document.getElementById('claimBtn');
  if(!box||!btn)return;
  const pending=wins.filter(p=>p.type!=='extra_attempt'&&p.type!=='no_prize');
  if(!pending.length){
@@ -404,30 +404,29 @@ function updateClaimCard(){
  const grouped=new Map();
  pending.forEach(p=>{if(!grouped.has(p.id))grouped.set(p.id,{p,count:0});grouped.get(p.id).count++});
  box.innerHTML=[...grouped.values()].map(x=>`${x.p.icon} ${x.p.fullName}${x.count>1?` × ${x.count}`:''}`).join('<br>');
- btn.disabled=false;
+ btn.disabled=spinning;
 }
 function sendPrintaWhatsApp(){
+ if(spinning)return;
  const redeemable=wins.filter(p=>p.type!=='extra_attempt'&&p.type!=='no_prize');
  if(!redeemable.length){updateClaimCard();return}
  const grouped=new Map();
  redeemable.forEach(p=>{if(!grouped.has(p.id))grouped.set(p.id,{p,count:0});grouped.get(p.id).count++});
  const lines=[...grouped.values()].map(x=>`${x.p.icon} ${x.p.fullName}${x.count>1?` × ${x.count}`:''}`);
- const msg=['أهلاً برينتا 👋','أنا خلصت لعبة Printa 🎡','ومكاسبي هي:',...lines,'','عايز أستلم مكاسبي 🎁'].join('\\n');
+ const msg=['أهلاً برينتا 👋','أنا خلصت لعبة Printa 🎡','ومكاسبي هي:',...lines,'','عايز أستلم مكاسبي 🎁'].join('\n');
  window.open('https://wa.me/201202662255?text='+encodeURIComponent(msg),'_blank','noopener');
- wins=[];
  updateClaimCard();
- prSaveGameState();
 }
 document.getElementById('claimBtn')?.addEventListener('click',sendPrintaWhatsApp);
 async function spin(strength=.5){
  if(spinning||tries<=0)return;
- spinning=true;const btn=document.getElementById('btn');btn.disabled=true;
+ spinning=true;const btn=document.getElementById('btn');btn.disabled=true;updateClaimCard();
  const prizes=activePrizes(),index=pick(prizes),prize={...prizes[index]},step=360/prizes.length;
  const bonus=prize.type==='extra_attempt'?prize.value:0;
  try{
   const ok=await prPlayServerAttempt(bonus);
-  if(!ok){spinning=false;tries=0;updateAttempts();btn.disabled=true;document.getElementById('result').textContent='مفيش محاولات متاحة حاليًا 🎡';return}
- }catch(e){spinning=false;btn.disabled=false;document.getElementById('result').textContent='حصلت مشكلة في تسجيل المحاولة. جرّب تاني.';return}
+  if(!ok){spinning=false;tries=0;updateAttempts();updateClaimCard();btn.disabled=true;document.getElementById('result').textContent='مفيش محاولات متاحة حاليًا 🎡';return}
+ }catch(e){spinning=false;btn.disabled=tries===0;updateClaimCard();document.getElementById('result').textContent='حصلت مشكلة في تسجيل المحاولة. جرّب تاني.';return}
  const target=(360-(index+.5)*step)%360,current=((rot%360)+360)%360,delta=(target-current+360)%360;
  const spinDuration=Math.round(3000+strength*2400);
  const fullTurns=3+Math.round(strength*4);rot+=fullTurns*360+delta;
@@ -437,12 +436,12 @@ async function spin(strength=.5){
  prSpinSound(spinDuration,strength);setTimeout(prWinSound,spinDuration+20);
  setTimeout(()=>{
   if(['price','discount'].includes(prize.type))sessionWonIds.add(prize.id);
-  if(prize.type!=='no_prize')wins.push(prize);
+  if(prize.type!=='no_prize'&&prize.type!=='extra_attempt')wins.push(prize);
   updateClaimCard();showPrize(prize);
   if(prize.type==='no_prize')setTimeout(prNearMiss,80);else setTimeout(()=>prCelebration(prize.celebration||'normal'),80);
   updateAttempts();prSaveGameState();
   document.getElementById('result').textContent=(prize.type==='no_prize'?'':'🎉 كسبت ')+prize.icon+' '+prize.shortName+(tries?' — باقي '+tries+' محاولة':' — خلصت محاولاتك!');
-  spinning=false;btn.disabled=tries===0;
+  spinning=false;btn.disabled=tries===0;updateClaimCard();
  },spinDuration+100);
 }
 function updateAttempts(){
@@ -830,7 +829,7 @@ function prApplause(level="special"){
   raf=requestAnimationFrame(paint);
  }
  function down(e){
-  if(spinning||tries<=0)return;
+  if(active||btn.disabled||spinning||tries<=0)return;
   active=true;start=performance.now();btn.classList.add('charging');btn.setPointerCapture?.(e.pointerId);paint();
  }
  function up(){
@@ -842,7 +841,10 @@ function prApplause(level="special"){
  }
  btn.addEventListener('pointerdown',down);
  btn.addEventListener('pointerup',up);
- btn.addEventListener('pointercancel',up);
+ btn.addEventListener('pointercancel',()=>{
+  active=false;cancelAnimationFrame(raf);btn.classList.remove('charging');
+  btn.style.setProperty('--charge',0);hint.textContent='اضغط واستمر للشحن ⚡';
+ });
 })();
 </script><button id="prBankOpen" onclick="prOpenBank()">🎁 بنك الهدايا</button>
 <div id="prBankPage"><button id="prBankClose" onclick="prCloseBank()">✕ رجوع للعجلة</button>
