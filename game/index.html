@@ -304,14 +304,16 @@ function prNormPhone(v){
  return String(v||'').trim().replace(/[٠-٩]/g,d=>String(a.indexOf(d))).replace(/[۰-۹]/g,d=>String(p.indexOf(d))).replace(/\D/g,'');
 }
 function prStateKey(){return 'printa_game_'+prCurrentPhone}
+let prSentWinCount=0;
 function prSaveGameState(){
  if(!prCurrentPhone)return;
- localStorage.setItem(prStateKey(),JSON.stringify({wins:wins.map(x=>x.id),premium:[...sessionWonIds]}));
+ localStorage.setItem(prStateKey(),JSON.stringify({wins:wins.map(x=>x.id),premium:[...sessionWonIds],sentWinCount:prSentWinCount}));
 }
 async function prLoadGameState(phone,name){
  prCurrentPhone=phone;
  let st=null;try{st=JSON.parse(localStorage.getItem(prStateKey())||'null')}catch(e){}
  wins=st&&Array.isArray(st.wins)?st.wins.map(id=>prizeConfig.find(x=>x.id===id)).filter(Boolean):[];
+ prSentWinCount=st&&Number.isInteger(st.sentWinCount)?Math.max(0,Math.min(st.sentWinCount,wins.length)):0;
  sessionWonIds=new Set(st&&Array.isArray(st.premium)?st.premium:[]);
  const rr=await fetch(PR_SB_URL+'/rest/v1/rpc/get_game_attempts',{method:'POST',
   headers:{apikey:PR_SB_KEY,'Content-Type':'application/json'},body:JSON.stringify({p_phone:phone})});
@@ -399,10 +401,20 @@ function updateClaimCard(){
  box.innerHTML=[...grouped.values()].map(x=>`${x.p.icon} ${x.p.fullName}${x.count>1?` × ${x.count}`:''}`).join('<br>');btn.disabled=false;
 }
 function sendPrintaWhatsApp(){
- const redeemable=wins.filter(p=>p.type!=='extra_attempt');if(!redeemable.length)return;
- const grouped=new Map();redeemable.forEach(p=>{if(!grouped.has(p.id))grouped.set(p.id,{p,count:0});grouped.get(p.id).count++});
+ const newWins=wins.slice(prSentWinCount);
+ const redeemable=newWins.filter(p=>p.type!=='extra_attempt'&&p.type!=='no_prize');
+ if(!redeemable.length){
+  const result=document.getElementById('result');
+  if(result)result.textContent='مفيش مكاسب جديدة للإرسال دلوقتي 🎁';
+  return;
+ }
+ const grouped=new Map();
+ redeemable.forEach(p=>{if(!grouped.has(p.id))grouped.set(p.id,{p,count:0});grouped.get(p.id).count++});
  const lines=[...grouped.values()].map(x=>`${x.p.icon} ${x.p.fullName}${x.count>1?` × ${x.count}`:''}`);
- const msg=['أهلاً برينتا 👋','أنا خلصت لعبة Printa 🎡',prCurrentPhone?('رقم الموبايل: '+prCurrentPhone):'', 'ومكاسبي هي:',...lines,'','عايز أستلم مكاسبي 🎁'].filter(Boolean).join('\n');
+ const msg=['أهلاً برينتا 👋','أنا خلصت لعبة Printa 🎡','ومكاسبي الجديدة هي:',...lines,'','عايز أستلم مكاسبي 🎁'].join('\\n');
+ prSentWinCount=wins.length;
+ prSaveGameState();
+ updateClaimCard();
  window.open('https://wa.me/201202662255?text='+encodeURIComponent(msg),'_blank','noopener');
 }
 document.getElementById('claimBtn')?.addEventListener('click',sendPrintaWhatsApp);
