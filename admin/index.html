@@ -1,16 +1,27 @@
 <!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Printa Admin</title>
 <style>*{box-sizing:border-box}body{margin:0;background:#0b1220;color:#fff;font-family:Tahoma,Arial;padding:18px}.wrap{max-width:520px;margin:auto}.card{background:#fff;color:#172033;border-radius:24px;padding:22px;margin:14px 0;box-shadow:0 15px 40px #0005}.brand{font-size:30px;font-weight:900}h1{font-size:23px;margin:8px 0}h2{font-size:20px}p{color:#697386;line-height:1.6}input{width:100%;height:52px;border:1px solid #d7dce5;border-radius:14px;text-align:center;font:bold 18px Tahoma;margin:7px 0}button{border:0;border-radius:13px;padding:13px;background:#e72e75;color:white;font:bold 16px Tahoma;cursor:pointer}.full{width:100%}.msg{text-align:center;min-height:25px;margin-top:10px;font-weight:bold}.gift{display:grid;grid-template-columns:1fr 76px;gap:8px;align-items:center;border-top:1px solid #eee;padding:12px 0}.gift b{font-size:15px}.gift small{display:block;color:#7b8495;margin-top:4px}.qty{height:42px;margin:0}.save{background:#172033;width:100%;margin-top:12px}.note{font-size:12px;color:#8b93a3;text-align:center}</style></head><body><div class="wrap">
-<div class="card"><div class="brand">Printa</div><h1>🎮 إدارة اللعبة</h1><p>اكتب رقم العميل واضغط لإضافة 5 محاولات.</p><input id="phone" inputmode="numeric" placeholder="01xxxxxxxxx"><button class="full" id="add">+5 محاولات</button><div class="msg" id="msg"></div></div>
-<div class="card"><h2>🎁 بنك الهدايا</h2><p>حدد الكمية المتاحة لكل هدية ثم اضغط حفظ البنك.</p>
-<div id="gifts"></div><button class="save" id="save">حفظ بنك الهدايا</button><div class="msg" id="bankmsg"></div></div>
+<div class="card"><div class="brand">Printa</div><h1>🎮 إدارة اللعبة</h1><p>اكتب رقم العميل واضغط لإضافة 5 محاولات.</p><input id="phone" inputmode="numeric" placeholder="01xxxxxxxxx"><div style="display:flex;gap:8px;align-items:center;margin:7px 0">
+<input id="attemptCount" type="number" min="1" max="100" value="5" style="margin:0;flex:1" aria-label="عدد المحاولات">
+<button class="full" id="add" style="flex:2">إضافة المحاولات</button>
+</div><div class="msg" id="msg"></div></div>
+<div class="card"><h2>🎁 إدارة جوائز العجلة</h2><p>تحكم في جوائز العجلة: الحد المتاح وتشغيل أو إيقاف كل جائزة.</p>
+<div id="gifts"></div><button class="save" id="save">حفظ إعدادات الجوائز</button><div class="msg" id="bankmsg"></div></div>
 <div class="note">لوحة إدارة خاصة — لا تشارك رابطها مع العملاء.</div></div>
 <script>
 const U='https://hnwzpsbqznugfqmjysyt.supabase.co',K='sb_publishable_eQ27kGNwDRLLRCPb71aIFA_UPoxP3fq',S='PRN-7x29-K4m8-2026';
-const defaults=[['price65','سعر الورقة 65 قرش',3],['sheets25','25 ورقة هدية',10],['discount5','خصم 5%',20],['stapler','دباسة هدية',5]];
+const defaults=[
+['point-one','نقطة واحدة',100],['points-two','نقطتين',80],
+['paper-five','5 ورقات هدية',50],['paper-ten','10 ورقات هدية',30],
+['paper-twentyfive','25 ورقة هدية',10],['pen','قلم جاف هدية',10],
+['stapler','دباسة هدية',5],['discount-five','خصم 5%',20],
+['next-order-price','سعر الورقة 65 قرش',3],
+['extra-one','+1 محاولة',999],['extra-two','+2 محاولة',999],['extra-three','+3 محاولات',999],
+['near-miss','يا خسارة!',999]
+];
 function norm(v){const a='٠١٢٣٤٥٦٧٨٩',b='۰۱۲۳۴۵۶۷۸۹';return String(v).replace(/[٠-٩]/g,x=>a.indexOf(x)).replace(/[۰-۹]/g,x=>b.indexOf(x)).replace(/\D/g,'')}
 async function rpc(fn,obj){let r=await fetch(U+'/rest/v1/rpc/'+fn,{method:'POST',headers:{apikey:K,'Content-Type':'application/json'},body:JSON.stringify(obj)});let t=await r.text();if(!r.ok)throw Error(t);return t?JSON.parse(t):null}
-add.onclick=async()=>{let p=norm(phone.value);if(!/^01\d{9}$/.test(p)){msg.textContent='راجع رقم الموبايل';return}add.disabled=true;msg.textContent='جاري الإضافة…';try{let n=await rpc('add_game_attempts',{p_sync_key:S,p_phone:p,p_attempts:5});msg.textContent='✅ تم — الرصيد الآن '+n+' محاولات'}catch(e){msg.textContent='❌ حصلت مشكلة'}add.disabled=false}
+add.onclick=async()=>{let p=norm(phone.value);if(!/^01\d{9}$/.test(p)){msg.textContent='راجع رقم الموبايل';return}add.disabled=true;msg.textContent='جاري الإضافة…';try{let n=await rpc('add_game_attempts',{p_sync_key:S,p_phone:p,p_attempts:Math.max(1,Math.min(100,parseInt(document.getElementById('attemptCount').value)||1))});msg.textContent='✅ تم — الرصيد الآن '+n+' محاولات'}catch(e){msg.textContent='❌ حصلت مشكلة'}add.disabled=false}
 function draw(rows){gifts.innerHTML='';(rows?.length?rows:defaults.map(x=>({gift_key:x[0],gift_name:x[1],quantity:x[2],enabled:true}))).forEach(g=>{let d=document.createElement('div');d.className='gift';d.innerHTML=`<div><b>${g.gift_name}</b><small><label><input style="width:auto;height:auto" type="checkbox" class="en" ${g.enabled?'checked':''}> مفعلة</label></small></div><input class="qty" type="number" min="0" value="${g.quantity}" data-key="${g.gift_key}" data-name="${g.gift_name}">`;gifts.appendChild(d)})}
 async function load(){try{draw(await rpc('get_game_gift_bank',{}))}catch(e){draw()}}load();
-save.onclick=async()=>{save.disabled=true;bankmsg.textContent='جاري الحفظ…';try{for(const q of document.querySelectorAll('.qty')){await rpc('admin_set_game_gift',{p_sync_key:S,p_gift_key:q.dataset.key,p_gift_name:q.dataset.name,p_quantity:Math.max(0,parseInt(q.value)||0),p_enabled:q.closest('.gift').querySelector('.en').checked})}bankmsg.textContent='✅ تم حفظ بنك الهدايا'}catch(e){bankmsg.textContent='❌ البنك محتاج تفعيل في Supabase'}save.disabled=false}
+save.onclick=async()=>{save.disabled=true;bankmsg.textContent='جاري الحفظ…';try{for(const q of document.querySelectorAll('.qty')){await rpc('admin_set_game_gift',{p_sync_key:S,p_gift_key:q.dataset.key,p_gift_name:q.dataset.name,p_quantity:Math.max(0,parseInt(q.value)||0),p_enabled:q.closest('.gift').querySelector('.en').checked})}bankmsg.textContent='✅ تم حفظ إعدادات الجوائز'}catch(e){bankmsg.textContent='❌ البنك محتاج تفعيل في Supabase'}save.disabled=false}
 </script></body></html>
