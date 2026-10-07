@@ -322,15 +322,15 @@ function prLoadLegacyHistory(phone){
  updateClaimCard();
 }
 async function prRefreshHistory(){
- if(!prRound)return;
+ if(!prRound||spinning)return;
  const id=prRound.id,phone=prRound.phone,version=prStateVersion;
  try{
   const list=await prRpc('get_game_reward_history',{p_round_id:id,p_token:prRound.token});
-  if(prRound?.id!==id||prRound.phone!==phone||version!==prStateVersion)return;
+  if(spinning||prRound?.id!==id||prRound.phone!==phone||version!==prStateVersion)return;
   if(!Array.isArray(list))throw Error('INVALID_HISTORY');
   prAllWins=list;prHistoryReady=true;document.getElementById('historyStatus').textContent='';updateClaimCard();
  }catch(e){
-  if(prRound?.id!==id||version!==prStateVersion)return;
+  if(spinning||prRound?.id!==id||version!==prStateVersion)return;
   document.getElementById('historyStatus').textContent='تعذر تحديث السجل الكامل حاليًا. مكاسب الدور الحالي محفوظة.';
  }
 }
@@ -462,9 +462,17 @@ document.getElementById('claimBtn')?.addEventListener('click',sendPrintaWhatsApp
 async function spin(strength=.5){
  if(spinning||tries<=0)return;
  spinning=true;prStateVersion++;const btn=document.getElementById('btn');btn.disabled=true;updateClaimCard();
+ document.getElementById('result').textContent='العجلة بتلف… استنى لحد ما تقف 🎡';
+ const previousLatest=document.getElementById('latest-prize').textContent;
+ const previousGift=document.querySelector('.gift').textContent;
+ document.getElementById('latest-prize').textContent='مستنيين نتيجة اللفة… 🎡';
+ document.querySelector('.gift').textContent='🎡';
+ document.getElementById('last-win').classList.remove('celebrate');
  let data;
  try{data=await prPlayServerAttempt()}
  catch(e){spinning=false;
+  document.getElementById('latest-prize').textContent=previousLatest;
+  document.querySelector('.gift').textContent=previousGift;
   if(e.message.includes('NO_ATTEMPTS'))tries=0;
   if(e.message.includes('ROUND_EXPIRED'))document.getElementById('prPhoneGate').classList.remove('hide');
   if(['NO_ATTEMPTS','NO_AVAILABLE_PRIZES','ROUND_EXPIRED'].some(x=>e.message.includes(x))){prPendingSpin=null;prSaveGameState()}
@@ -479,9 +487,16 @@ async function spin(strength=.5){
  const fullTurns=3+Math.round(strength*4);rot+=fullTurns*360+delta;
  const wheel=document.getElementById('wheel');
  wheel.style.transition='transform '+spinDuration+'ms cubic-bezier(.12,.72,.16,1)';
- wheel.style.transform='rotate('+rot+'deg)';
- prSpinSound(spinDuration,strength);setTimeout(prWinSound,spinDuration+20);
- setTimeout(()=>{
+ // Register completion before starting the transition. Reveal exactly once.
+ let revealed=false,revealFallback;
+ function onWheelStop(event){
+  if(event.target===wheel&&event.propertyName==='transform')revealPrize();
+ }
+ function revealPrize(){
+  if(revealed)return;
+  revealed=true;clearTimeout(revealFallback);
+  wheel.removeEventListener('transitionend',onWheelStop);
+  prWinSound();
   if(!prCompletedSpinIds.has(data.spin_id)&&prize.type!=='no_prize'&&prize.type!=='extra_attempt'){wins.push(prize);if(prHistoryReady)prAllWins.push(prize);}
   prCompletedSpinIds.add(data.spin_id);prPendingSpin=null;
   // مزامنة إعدادات الجولة القادمة بدون إعادة رسم العجلة وهي متوقفة على نتيجة الجولة الحالية.
@@ -491,7 +506,17 @@ async function spin(strength=.5){
   updateAttempts();prSaveGameState();
   document.getElementById('result').textContent=(prize.type==='no_prize'?'':'🎉 كسبت ')+prize.icon+' '+prize.shortName+(tries?' — باقي '+tries+' محاولة':' — خلصت محاولاتك!');
   spinning=false;btn.disabled=tries===0;updateClaimCard();prRefreshServerAttempts().catch(()=>{});
- },spinDuration+100);
+ }
+ wheel.addEventListener('transitionend',onWheelStop);
+ // Force the initial pose to be painted before applying the final rotation.
+ void wheel.offsetWidth;
+ wheel.style.transform='rotate('+rot+'deg)';
+ prSpinSound(spinDuration,strength);
+ revealFallback=setTimeout(()=>{
+  // If the browser suppresses transitionend, stop at the chosen sector first.
+  wheel.style.transition='none';wheel.style.transform='rotate('+rot+'deg)';
+  void wheel.offsetWidth;revealPrize();
+ },spinDuration+250);
 }
 function updateAttempts(){
  const dots=document.querySelector('.dots'),count=tries;dots.replaceChildren();
