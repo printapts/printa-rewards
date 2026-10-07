@@ -360,7 +360,9 @@ function prSyncPrizes(list){
 }
 function prApplyRoundState(data){
  tries=prReadAttempts(data.attempts);wins=Array.isArray(data.wins)?data.wins:[];
- const last=wins[wins.length-1];document.getElementById("latest-prize").textContent=last?last.fullName:"لم تقم باللف بعد — حظًا موفقًا ♥";document.querySelector(".gift").textContent=last?last.icon:"🎁";
+ if(prDisplayedPrizeId===null){
+  const last=wins[wins.length-1];document.getElementById("latest-prize").textContent=last?last.fullName:"لم تقم باللف بعد — حظًا موفقًا ♥";document.querySelector(".gift").textContent=last?last.icon:"🎁";
+ }
  prCompletedSpinIds=new Set(data.spin_ids||[]);if((data.request_ids||[]).includes(prPendingSpin))prPendingSpin=null;prSyncPrizes(data.prizes);prSaveGameState();
  updateClaimCard();updateAttempts();document.getElementById('btn').disabled=tries===0||!activePrizes().length;
 }
@@ -380,7 +382,7 @@ async function prPlayServerAttempt(){
  if(!prRound)throw new Error('ROUND_EXPIRED');
  if(!prPendingSpin)prPendingSpin=crypto.randomUUID();prSaveGameState();
  const data=await prRpc('play_game_spin',{p_round_id:prRound.id,p_token:prRound.token,p_request_id:prPendingSpin});
- tries=prReadAttempts(data.attempts);updateAttempts();return data;
+ prReadAttempts(data.attempts);return data;
 }
 async function prRefreshServerAttempts(){
  if(!prRound||spinning)return tries;
@@ -495,6 +497,7 @@ async function spin(strength=.5){
  function revealPrize(){
   if(revealed)return;
   revealed=true;clearTimeout(revealFallback);
+   tries=prReadAttempts(data.attempts);
   wheel.removeEventListener('transitionend',onWheelStop);
   prWinSound();
   if(!prCompletedSpinIds.has(data.spin_id)&&prize.type!=='no_prize'&&prize.type!=='extra_attempt'){wins.push(prize);if(prHistoryReady)prAllWins.push(prize);}
