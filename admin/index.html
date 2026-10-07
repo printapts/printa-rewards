@@ -1,6 +1,6 @@
 <!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Printa Admin</title>
 <style>*{box-sizing:border-box}body{margin:0;background:#0b1220;color:#fff;font-family:Tahoma,Arial;padding:18px}.wrap{max-width:520px;margin:auto}.card{background:#fff;color:#172033;border-radius:24px;padding:22px;margin:14px 0;box-shadow:0 15px 40px #0005}.brand{font-size:30px;font-weight:900}h1{font-size:23px;margin:8px 0}h2{font-size:20px}p{color:#697386;line-height:1.6}input{width:100%;height:52px;border:1px solid #d7dce5;border-radius:14px;text-align:center;font:bold 18px Tahoma;margin:7px 0}button{border:0;border-radius:13px;padding:13px;background:#e72e75;color:white;font:bold 16px Tahoma;cursor:pointer}.full{width:100%}.msg{text-align:center;min-height:25px;margin-top:10px;font-weight:bold}.gift{display:grid;grid-template-columns:1fr 76px;gap:8px;align-items:center;border-top:1px solid #eee;padding:12px 0}.gift b{font-size:15px}.gift small{display:block;color:#7b8495;margin-top:4px}.qty{height:42px;margin:0}.save{background:#172033;width:100%;margin-top:12px}.note{font-size:12px;color:#8b93a3;text-align:center}[hidden]{display:none!important}.wrap{max-width:960px}.gift{display:block;padding:16px 0}.gift small{display:block;line-height:1.8}.fields{display:grid;grid-template-columns:90px 1fr 1fr;gap:10px;align-items:center;margin-top:8px}.fields label{font-size:12px}.fields input{height:42px;font-size:16px}.fields .en{width:22px;height:22px;display:block}.spinRow{overflow-wrap:anywhere;display:flex;justify-content:space-between;gap:12px;align-items:center;border-top:1px solid #ddd;padding:12px 0;font-size:13px;line-height:1.8}button:disabled{opacity:.5;cursor:default}.msg{overflow-wrap:anywhere}#customer{color:#183e83}@media(max-width:460px){.fields{grid-template-columns:60px 1fr 1fr}.card{padding:16px}.spinRow{flex-wrap:wrap}}
-</style></head><body><div class="wrap"><div id="authCard" class="card"><div class="brand">Printa</div><h1>إدارة اللعبة</h1><p>افتح الرابط الخاص بالإدارة للدخول مباشرة.</p><div id="authmsg" class="msg"></div></div><div id="controls" hidden><button id="logout">تسجيل الخروج</button><div id="activationStatus" class="msg"></div>
+</style></head><body><div class="wrap"><div id="authCard" class="card"><div class="brand">Printa</div><h1>إدارة اللعبة</h1><p>أدخل باسورد الإدارة.</p><input id="adminPassword" type="password" inputmode="numeric" autocomplete="current-password" placeholder="باسورد الإدارة"><button id="login" class="full">دخول</button><div id="authmsg" class="msg"></div></div><div id="controls" hidden><button id="logout">تسجيل الخروج</button><div id="activationStatus" class="msg"></div>
 <div class="card"><div class="brand">Printa</div><h1>🎮 إدارة اللعبة</h1><p>ابحث عن رصيد العميل، أو أضف العدد الذي تختاره إلى رصيده الحالي.</p><input id="phone" inputmode="numeric" placeholder="01xxxxxxxxx"><div style="display:flex;gap:8px;align-items:center;margin:7px 0">
 <input id="attemptCount" type="number" min="1" max="1000000" value="5" style="margin:0;flex:1" aria-label="عدد المحاولات">
 <button class="full" id="add" style="flex:2">إضافة المحاولات</button>
@@ -29,7 +29,7 @@ async function activateBank(){
  }catch(e){el('activationStatus').textContent='تفعيل الحماية لم يكتمل: '+explain(e)}
 }
 async function enter(){bank=await rpc('get_game_gift_bank');el('authCard').hidden=true;el('controls').hidden=false;draw();await loadSpins();await activateBank()}
-el('logout').onclick=()=>{saveSession(null);el('controls').hidden=true;el('authCard').hidden=false;customer=null;el('customer').textContent=''};
+el('logout').onclick=()=>{saveSession(null);localStorage.removeItem('printa_admin_password_ok');el('controls').hidden=true;el('authCard').hidden=false;customer=null;el('customer').textContent=''};
 async function search(){const p=norm(el('phone').value);if(!/^01\d{9}$/.test(p))throw Error('راجع رقم الموبايل');customer=await rpc('admin_game_customer',{p_phone:p});el('customer').textContent=customer.name+' — الرصيد الحالي: '+customer.attempts+' محاولة';return p}
 el('search').onclick=async()=>{el('search').disabled=true;try{await search();el('msg').textContent='';await loadSpins(customer.phone)}catch(e){el('msg').textContent=explain(e)}finally{el('search').disabled=false}};
 el('add').onclick=async()=>{el('add').disabled=true;el('msg').textContent='جاري الإضافة…';try{const p=norm(el('phone').value),amount=Number(el('attemptCount').value);if(!/^01\d{9}$/.test(p)||!Number.isInteger(amount)||amount<1||amount>1000000)throw Error('أدخل رقمًا صحيحًا وعددًا من 1 إلى 1000000');
@@ -57,9 +57,32 @@ el('save').onclick=async()=>{el('save').disabled=true;el('bankmsg').textContent=
  }catch(e){el('bankmsg').textContent=explain(e)}finally{el('save').disabled=false}};
 async function loadSpins(phone=null){const rows=await rpc('admin_game_spins',{p_phone:phone});const host=el('spins');host.replaceChildren();if(!rows.length){host.textContent='لا توجد جوائز مسجلة بعد';return}for(const s of rows){const d=document.createElement('div');d.className='spinRow';const label=document.createElement('span');label.textContent=s.phone+' — '+s.prize.icon+' '+s.prize.fullName+' — '+new Date(s.created_at).toLocaleString('ar-EG')+' — مرجع الدور: '+(s.round_id||s.id);d.append(label);const btn=document.createElement('button');btn.textContent=s.redeemed_at?'تم التسليم ✅':'تسجيل التسليم';btn.disabled=!!s.redeemed_at;btn.onclick=async()=>{btn.disabled=true;try{await rpc('admin_redeem_game_spin',{p_spin_id:s.id});await loadSpins(phone);bank=await rpc('get_game_gift_bank');draw()}catch(e){btn.disabled=false;el('historymsg').textContent=explain(e)}};d.append(btn);host.append(d)}}
 el('reloadSpins').onclick=()=>loadSpins(customer?.phone||null).catch(e=>el('historymsg').textContent=explain(e));
+const ADMIN_PASSWORD='777';
+const SAVED_ADMIN_TOKEN='afc50bfe3a0d54b16b7321575418d6766ef417fb0ed72e273e64170aa7d97b89';
+function showAdmin(){el('authCard').hidden=true;el('controls').hidden=false;}
+async function passwordLogin(){
+ const v=el('adminPassword').value.trim();
+ if(v!==ADMIN_PASSWORD){el('authmsg').textContent='الباسورد غير صحيح';return}
+ localStorage.setItem('printa_admin_password_ok','1');
+ session={admin_token:SAVED_ADMIN_TOKEN};
+ saveSession(session);
+ enter().catch(e=>{el('authmsg').textContent=explain(e)})
+}
+el('login').onclick=passwordLogin;
+el('adminPassword').addEventListener('keydown',e=>{if(e.key==='Enter')passwordLogin()});
 try{session=JSON.parse(sessionStorage.getItem('printa_admin_auth')||'null')}catch(e){}
 const callback=new URLSearchParams(location.hash.slice(1));
 if(callback.has('admin')){saveSession({admin_token:callback.get('admin')});history.replaceState(null,'',location.pathname+location.search)}
-if(session)enter().catch(e=>{saveSession(null);el('authmsg').textContent=explain(e)});
+if(localStorage.getItem('printa_admin_password_ok')==='1'){
+ session={admin_token:SAVED_ADMIN_TOKEN};
+ saveSession(session);
+}
+if(session)enter().catch(e=>{
+ saveSession(null);
+ localStorage.removeItem('printa_admin_password_ok');
+ el('controls').hidden=true;
+ el('authCard').hidden=false;
+ el('authmsg').textContent=explain(e);
+});
 
 </script></body></html>
