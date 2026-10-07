@@ -498,7 +498,7 @@ function showPrize(prize){
  document.querySelector('.gift').textContent=prize.icon;card.classList.remove('celebrate');
  if(prize.type==='no_prize')return;
  void card.offsetWidth;card.classList.add('celebrate');
- if(card.getBoundingClientRect().bottom>innerHeight)card.scrollIntoView({block:'nearest',behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth'});
+ /* Keep the game viewport fixed after the wheel stops; do not auto-scroll to the result card. */
  if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;
  const layer=document.getElementById('confetti-layer'),colors=['#e73576','#efbd48','#60c9c4','#a48adc'],count={none:0,normal:38,special:75,major:110}[prize.celebration];
  for(let n=0;n<count;n++){const piece=document.createElement('i');piece.className='confetti';piece.style.left=(n*37%100)+'%';piece.style.background=colors[n%4];piece.style.setProperty('--duration',(2.3+n%9*.13)+'s');piece.style.setProperty('--drift',((n%2?1:-1)*(20+n%80))+'px');piece.style.animationDelay=(n%7*.055)+'s';layer.appendChild(piece);piece.addEventListener('animationend',()=>piece.remove(),{once:true})}
