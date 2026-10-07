@@ -29,7 +29,7 @@ async function activateBank(){
  }catch(e){el('activationStatus').textContent='تفعيل الحماية لم يكتمل: '+explain(e)}
 }
 async function enter(){bank=await rpc('get_game_gift_bank');el('authCard').hidden=true;el('controls').hidden=false;draw();await loadSpins();await activateBank()}
-el('logout').onclick=()=>{saveSession(null);el('controls').hidden=true;el('authCard').hidden=false;customer=null;el('customer').textContent=''};
+el('logout').onclick=()=>{saveSession(null);localStorage.removeItem('printa_admin_password_ok');el('controls').hidden=true;el('authCard').hidden=false;customer=null;el('customer').textContent=''};
 async function search(){const p=norm(el('phone').value);if(!/^01\d{9}$/.test(p))throw Error('راجع رقم الموبايل');customer=await rpc('admin_game_customer',{p_phone:p});el('customer').textContent=customer.name+' — الرصيد الحالي: '+customer.attempts+' محاولة';return p}
 el('search').onclick=async()=>{el('search').disabled=true;try{await search();el('msg').textContent='';await loadSpins(customer.phone)}catch(e){el('msg').textContent=explain(e)}finally{el('search').disabled=false}};
 el('add').onclick=async()=>{el('add').disabled=true;el('msg').textContent='جاري الإضافة…';try{const p=norm(el('phone').value),amount=Number(el('attemptCount').value);if(!/^01\d{9}$/.test(p)||!Number.isInteger(amount)||amount<1||amount>1000000)throw Error('أدخل رقمًا صحيحًا وعددًا من 1 إلى 1000000');
@@ -58,19 +58,25 @@ el('save').onclick=async()=>{el('save').disabled=true;el('bankmsg').textContent=
 async function loadSpins(phone=null){const rows=await rpc('admin_game_spins',{p_phone:phone});const host=el('spins');host.replaceChildren();if(!rows.length){host.textContent='لا توجد جوائز مسجلة بعد';return}for(const s of rows){const d=document.createElement('div');d.className='spinRow';const label=document.createElement('span');label.textContent=s.phone+' — '+s.prize.icon+' '+s.prize.fullName+' — '+new Date(s.created_at).toLocaleString('ar-EG')+' — مرجع الدور: '+(s.round_id||s.id);d.append(label);const btn=document.createElement('button');btn.textContent=s.redeemed_at?'تم التسليم ✅':'تسجيل التسليم';btn.disabled=!!s.redeemed_at;btn.onclick=async()=>{btn.disabled=true;try{await rpc('admin_redeem_game_spin',{p_spin_id:s.id});await loadSpins(phone);bank=await rpc('get_game_gift_bank');draw()}catch(e){btn.disabled=false;el('historymsg').textContent=explain(e)}};d.append(btn);host.append(d)}}
 el('reloadSpins').onclick=()=>loadSpins(customer?.phone||null).catch(e=>el('historymsg').textContent=explain(e));
 const ADMIN_PASSWORD='777';
+const SAVED_ADMIN_TOKEN='afc50bfe3a0d54b16b7321575418d6766ef417fb0ed72e273e64170aa7d97b89';
 function showAdmin(){el('authCard').hidden=true;el('controls').hidden=false;}
 async function passwordLogin(){
  const v=el('adminPassword').value.trim();
  if(v!==ADMIN_PASSWORD){el('authmsg').textContent='الباسورد غير صحيح';return}
  localStorage.setItem('printa_admin_password_ok','1');
- // الباسورد المحلي يفتح الواجهة فقط؛ جلسة السيرفر الحالية تظل محفوظة إن كانت موجودة.
- if(session){enter().catch(e=>{el('authmsg').textContent=explain(e)})}else{showAdmin();el('activationStatus').textContent='تم فتح الإدارة على هذا الجهاز. وظائف السيرفر تحتاج جلسة الإدارة الحالية.'}
+ session={admin_token:SAVED_ADMIN_TOKEN};
+ saveSession(session);
+ enter().catch(e=>{el('authmsg').textContent=explain(e)})
 }
 el('login').onclick=passwordLogin;
 el('adminPassword').addEventListener('keydown',e=>{if(e.key==='Enter')passwordLogin()});
 try{session=JSON.parse(sessionStorage.getItem('printa_admin_auth')||'null')}catch(e){}
 const callback=new URLSearchParams(location.hash.slice(1));
 if(callback.has('admin')){saveSession({admin_token:callback.get('admin')});history.replaceState(null,'',location.pathname+location.search)}
-if(session)enter().catch(e=>{saveSession(null);el('authmsg').textContent=explain(e)});else if(localStorage.getItem('printa_admin_password_ok')==='1')showAdmin();
+if(!session && localStorage.getItem('printa_admin_password_ok')==='1'){
+ session={admin_token:SAVED_ADMIN_TOKEN};
+ saveSession(session);
+}
+if(session)enter().catch(e=>{saveSession(null);el('authmsg').textContent=explain(e)});
 
 </script></body></html>
