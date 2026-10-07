@@ -166,7 +166,7 @@ html,body{width:100%;max-width:100%;overflow-x:hidden!important}
 #prBankPage .notice{position:fixed;left:12px;right:12px;bottom:12px;max-width:500px;margin:auto;background:#fff;color:#13213a;border-radius:14px;padding:12px;text-align:center;font-weight:700;display:none;box-shadow:0 10px 35px #0008}
 @media(max-width:430px){#prBankPage .wrap{padding:10px 9px 45px}#prBankPage .grid{gap:7px}#prBankPage .card{padding:10px;min-height:110px}#prBankPage h1{font-size:21px}}
 
-</style></head><body>
+</style><style id="pr-wheel-direction-fix">.wheel{direction:ltr}.prize-label{direction:rtl}</style></head><body>
 <div id="prPhoneGate">
  <div class="prLogin">
   <div class="gameMark">🎡</div>
@@ -299,7 +299,7 @@ html,body{width:100%;max-width:100%;overflow-x:hidden!important}
     "celebration": "major"
   }
 ]</script><script>
-let tries=0,rot=0,wins=[],spinning=false;
+let tries=0,rot=0,wins=[],spinning=false,prDisplayedPrizeId=null;
 const INITIAL_TRIES=5;
 let prizeConfig=validatePrizeConfig(JSON.parse(document.getElementById('prize-config').textContent));
 
@@ -354,7 +354,9 @@ async function prRpc(fn,args={}){
 }
 function prReadAttempts(value){if(!Number.isInteger(value)||value<0)throw new Error('INVALID_ATTEMPTS');return value}
 function prSyncPrizes(list){
- prizeConfig=list.length?validatePrizeConfig(list):[];buildWheel();
+ prizeConfig=list.length?validatePrizeConfig(list):[];
+ // Keep the landed wheel intact; refreshed settings are drawn before the next spin.
+ if(prDisplayedPrizeId===null)buildWheel();
 }
 function prApplyRoundState(data){
  tries=prReadAttempts(data.attempts);wins=Array.isArray(data.wins)?data.wins:[];
@@ -365,7 +367,7 @@ function prApplyRoundState(data){
 async function prLoadGameState(phone,name){
  const version=++prStateVersion;const data=await prRpc('begin_game_round',{p_phone:phone});
  if(version!==prStateVersion)return;
- prRound={id:data.round_id,token:data.token,phone:data.phone,name:data.name};prCurrentPhone=phone;prPendingSpin=null;
+ prRound={id:data.round_id,token:data.token,phone:data.phone,name:data.name};prCurrentPhone=phone;prPendingSpin=null;prDisplayedPrizeId=null;
  prLoadLegacyHistory(phone);prApplyRoundState(data);prSaveGameState();prShowPlayer();prRefreshHistory();
  document.getElementById('result').textContent=tries?('عندك '+tries+' محاولات… يلا!'):'مفيش محاولات متاحة حاليًا 🎡';
 }
@@ -404,7 +406,7 @@ const prNewRound=document.createElement('button');prNewRound.id='prNewRound';prN
 prNewRound.style.cssText='width:auto;min-height:0;padding:4px 7px;font-size:11px;box-shadow:none;margin:0';
 prNewRound.onclick=()=>{
  if(spinning)return;
- prStateVersion++;prRound=null;prPendingSpin=null;prCompletedSpinIds.clear();wins=[];tries=0;rot=0;
+ prStateVersion++;prRound=null;prPendingSpin=null;prCompletedSpinIds.clear();wins=[];tries=0;rot=0;prDisplayedPrizeId=null;
  sessionStorage.removeItem('printa_server_round');sessionStorage.removeItem('printa_pending_spin');
  const wheel=document.getElementById('wheel');wheel.style.transition='none';wheel.style.transform='rotate(0deg)';void wheel.offsetWidth;
  const card=document.getElementById('last-win');card.classList.remove('celebrate');
@@ -469,7 +471,8 @@ async function spin(strength=.5){
   updateAttempts();btn.disabled=tries===0;updateClaimCard();document.getElementById('result').textContent=e.message.includes('NO_ATTEMPTS')?'مفيش محاولات متاحة حاليًا 🎡':e.message.includes('NO_AVAILABLE_PRIZES')?'الجوائز غير متاحة حاليًا. رصيدك محفوظ.':'تعذر تأكيد اللفة. اضغط مرة أخرى لاستعادة نفس النتيجة.';return;
  }
  const prize=data.prize;
- if(!activePrizes().some(p=>p.id===prize.id)){prizeConfig.push({...prize,enabled:true});buildWheel()}
+ if(!activePrizes().some(p=>p.id===prize.id)){prizeConfig=prizeConfig.filter(p=>p.id!==prize.id);prizeConfig.push({...prize,enabled:true});}
+ buildWheel();
  const prizes=activePrizes(),index=prizes.findIndex(p=>p.id===prize.id),step=360/prizes.length;
  const target=(360-(index+.5)*step)%360,current=((rot%360)+360)%360,delta=(target-current+360)%360;
  const spinDuration=Math.round(3000+strength*2400);
@@ -496,6 +499,7 @@ function updateAttempts(){
  document.getElementById('tries-label').textContent=tries+' محاولات متاحة';dots.setAttribute('aria-label',tries+' محاولات متبقية');
 }
 function showPrize(prize){
+ prDisplayedPrizeId=prize.id;
  const latest=document.getElementById('latest-prize'),card=document.getElementById('last-win');latest.textContent=prize.fullName;latest.style.setProperty('--prize-icon','"'+prize.icon+'"');
  document.querySelector('.gift').textContent=prize.icon;card.classList.remove('celebrate');
  if(prize.type==='no_prize')return;
