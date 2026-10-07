@@ -1,27 +1,65 @@
 <!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Printa Admin</title>
-<style>*{box-sizing:border-box}body{margin:0;background:#0b1220;color:#fff;font-family:Tahoma,Arial;padding:18px}.wrap{max-width:520px;margin:auto}.card{background:#fff;color:#172033;border-radius:24px;padding:22px;margin:14px 0;box-shadow:0 15px 40px #0005}.brand{font-size:30px;font-weight:900}h1{font-size:23px;margin:8px 0}h2{font-size:20px}p{color:#697386;line-height:1.6}input{width:100%;height:52px;border:1px solid #d7dce5;border-radius:14px;text-align:center;font:bold 18px Tahoma;margin:7px 0}button{border:0;border-radius:13px;padding:13px;background:#e72e75;color:white;font:bold 16px Tahoma;cursor:pointer}.full{width:100%}.msg{text-align:center;min-height:25px;margin-top:10px;font-weight:bold}.gift{display:grid;grid-template-columns:1fr 76px;gap:8px;align-items:center;border-top:1px solid #eee;padding:12px 0}.gift b{font-size:15px}.gift small{display:block;color:#7b8495;margin-top:4px}.qty{height:42px;margin:0}.save{background:#172033;width:100%;margin-top:12px}.note{font-size:12px;color:#8b93a3;text-align:center}</style></head><body><div class="wrap">
-<div class="card"><div class="brand">Printa</div><h1>🎮 إدارة اللعبة</h1><p>اكتب رقم العميل واضغط لإضافة 5 محاولات.</p><input id="phone" inputmode="numeric" placeholder="01xxxxxxxxx"><div style="display:flex;gap:8px;align-items:center;margin:7px 0">
-<input id="attemptCount" type="number" min="1" max="100" value="5" style="margin:0;flex:1" aria-label="عدد المحاولات">
+<style>*{box-sizing:border-box}body{margin:0;background:#0b1220;color:#fff;font-family:Tahoma,Arial;padding:18px}.wrap{max-width:520px;margin:auto}.card{background:#fff;color:#172033;border-radius:24px;padding:22px;margin:14px 0;box-shadow:0 15px 40px #0005}.brand{font-size:30px;font-weight:900}h1{font-size:23px;margin:8px 0}h2{font-size:20px}p{color:#697386;line-height:1.6}input{width:100%;height:52px;border:1px solid #d7dce5;border-radius:14px;text-align:center;font:bold 18px Tahoma;margin:7px 0}button{border:0;border-radius:13px;padding:13px;background:#e72e75;color:white;font:bold 16px Tahoma;cursor:pointer}.full{width:100%}.msg{text-align:center;min-height:25px;margin-top:10px;font-weight:bold}.gift{display:grid;grid-template-columns:1fr 76px;gap:8px;align-items:center;border-top:1px solid #eee;padding:12px 0}.gift b{font-size:15px}.gift small{display:block;color:#7b8495;margin-top:4px}.qty{height:42px;margin:0}.save{background:#172033;width:100%;margin-top:12px}.note{font-size:12px;color:#8b93a3;text-align:center}[hidden]{display:none!important}.wrap{max-width:960px}.gift{display:block;padding:16px 0}.gift small{display:block;line-height:1.8}.fields{display:grid;grid-template-columns:90px 1fr 1fr;gap:10px;align-items:center;margin-top:8px}.fields label{font-size:12px}.fields input{height:42px;font-size:16px}.fields .en{width:22px;height:22px;display:block}.spinRow{overflow-wrap:anywhere;display:flex;justify-content:space-between;gap:12px;align-items:center;border-top:1px solid #ddd;padding:12px 0;font-size:13px;line-height:1.8}button:disabled{opacity:.5;cursor:default}.msg{overflow-wrap:anywhere}#customer{color:#183e83}@media(max-width:460px){.fields{grid-template-columns:60px 1fr 1fr}.card{padding:16px}.spinRow{flex-wrap:wrap}}
+</style></head><body><div class="wrap"><div id="authCard" class="card"><div class="brand">Printa</div><h1>إدارة اللعبة</h1><p>افتح الرابط الخاص بالإدارة للدخول مباشرة.</p><div id="authmsg" class="msg"></div></div><div id="controls" hidden><button id="logout">تسجيل الخروج</button><div id="activationStatus" class="msg"></div>
+<div class="card"><div class="brand">Printa</div><h1>🎮 إدارة اللعبة</h1><p>ابحث عن رصيد العميل، أو أضف العدد الذي تختاره إلى رصيده الحالي.</p><input id="phone" inputmode="numeric" placeholder="01xxxxxxxxx"><div style="display:flex;gap:8px;align-items:center;margin:7px 0">
+<input id="attemptCount" type="number" min="1" max="1000000" value="5" style="margin:0;flex:1" aria-label="عدد المحاولات">
 <button class="full" id="add" style="flex:2">إضافة المحاولات</button>
-</div><div class="msg" id="msg"></div></div>
+</div><button id="search" class="full">بحث عن الرصيد الحالي</button><div id="customer" class="msg"></div><div class="msg" id="msg"></div></div>
 <div class="card"><h2>🎁 إدارة جوائز العجلة</h2><p>تحكم في جوائز العجلة: الحد المتاح وتشغيل أو إيقاف كل جائزة.</p>
-<div id="gifts"></div><button class="save" id="save">حفظ إعدادات الجوائز</button><div class="msg" id="bankmsg"></div></div>
-<div class="note">لوحة إدارة خاصة — لا تشارك رابطها مع العملاء.</div></div>
+<p>الحد الإجمالي يشمل ما فاز به العملاء بالفعل. اتركه فارغًا ليكون غير محدود. وزن الاحتمال يُقسم على مجموع أوزان الجوائز المتاحة.</p><button id="reloadBank">تحديث البنك</button><div id="gifts"></div><button class="save" id="save">حفظ إعدادات الجوائز</button><div class="msg" id="bankmsg"></div></div>
+<div class="card"><h2>سجل الجوائز والتسليم</h2><p>الفوز يحجز الجائزة من المخزون. تسجيل التسليم يوضح ما استلمه العميل بالفعل. يُعرض آخر 100 جائزة.</p><button id="reloadSpins">تحديث السجل</button><div id="spins"></div><div id="historymsg" class="msg"></div></div></div></div>
 <script>
-const U='https://hnwzpsbqznugfqmjysyt.supabase.co',K='sb_publishable_eQ27kGNwDRLLRCPb71aIFA_UPoxP3fq',S='PRN-7x29-K4m8-2026';
-const defaults=[
-['point-one','نقطة واحدة',100],['points-two','نقطتين',80],
-['paper-five','5 ورقات هدية',50],['paper-ten','10 ورقات هدية',30],
-['paper-twentyfive','25 ورقة هدية',10],['pen','قلم جاف هدية',10],
-['stapler','دباسة هدية',5],['discount-five','خصم 5%',20],
-['next-order-price','سعر الورقة 65 قرش',3],
-['extra-one','+1 محاولة',999],['extra-two','+2 محاولة',999],['extra-three','+3 محاولات',999],
-['near-miss','يا خسارة!',999]
-];
+const U='https://hnwzpsbqznugfqmjysyt.supabase.co',K='sb_publishable_eQ27kGNwDRLLRCPb71aIFA_UPoxP3fq';
+const el=id=>document.getElementById(id);
+let session=null,bank=[],customer=null,pendingAdd=null,pendingSave=null;
+const messages={ADMIN_REQUIRED:'هذا الحساب غير مصرح له بإدارة اللعبة.',CUSTOMER_NOT_FOUND:'رقم العميل غير مسجل.',STALE_SETTINGS:'تغيرت الإعدادات في صفحة أخرى. حدّث البنك قبل الحفظ.',INVALID_QUANTITY:'الحد الإجمالي لا يمكن أن يقل عن عدد مرات الفوز المسجلة.',KEEP_ONE_AVAILABLE_PRIZE:'يجب إبقاء جائزة متاحة واحدة على الأقل باحتمال أكبر من صفر.'};
+function explain(e){for(const [k,v] of Object.entries(messages))if(e.message.includes(k))return v;return 'تعذر إتمام الطلب. '+e.message.slice(0,160)}
 function norm(v){const a='٠١٢٣٤٥٦٧٨٩',b='۰۱۲۳۴۵۶۷۸۹';return String(v).replace(/[٠-٩]/g,x=>a.indexOf(x)).replace(/[۰-۹]/g,x=>b.indexOf(x)).replace(/\D/g,'')}
-async function rpc(fn,obj){let r=await fetch(U+'/rest/v1/rpc/'+fn,{method:'POST',headers:{apikey:K,'Content-Type':'application/json'},body:JSON.stringify(obj)});let t=await r.text();if(!r.ok)throw Error(t);return t?JSON.parse(t):null}
-add.onclick=async()=>{let p=norm(phone.value);if(!/^01\d{9}$/.test(p)){msg.textContent='راجع رقم الموبايل';return}add.disabled=true;msg.textContent='جاري الإضافة…';try{let n=await rpc('add_game_attempts',{p_sync_key:S,p_phone:p,p_attempts:Math.max(1,Math.min(100,parseInt(document.getElementById('attemptCount').value)||1))});msg.textContent='✅ تم — الرصيد الآن '+n+' محاولات'}catch(e){msg.textContent='❌ حصلت مشكلة'}add.disabled=false}
-function draw(rows){gifts.innerHTML='';(rows?.length?rows:defaults.map(x=>({gift_key:x[0],gift_name:x[1],quantity:x[2],enabled:true}))).forEach(g=>{let d=document.createElement('div');d.className='gift';d.innerHTML=`<div><b>${g.gift_name}</b><small><label><input style="width:auto;height:auto" type="checkbox" class="en" ${g.enabled?'checked':''}> مفعلة</label></small></div><input class="qty" type="number" min="0" value="${g.quantity}" data-key="${g.gift_key}" data-name="${g.gift_name}">`;gifts.appendChild(d)})}
-async function load(){try{draw(await rpc('get_game_gift_bank',{}))}catch(e){draw()}}load();
-save.onclick=async()=>{save.disabled=true;bankmsg.textContent='جاري الحفظ…';try{for(const q of document.querySelectorAll('.qty')){await rpc('admin_set_game_gift',{p_sync_key:S,p_gift_key:q.dataset.key,p_gift_name:q.dataset.name,p_quantity:Math.max(0,parseInt(q.value)||0),p_enabled:q.closest('.gift').querySelector('.en').checked})}bankmsg.textContent='✅ تم حفظ إعدادات الجوائز'}catch(e){bankmsg.textContent='❌ البنك محتاج تفعيل في Supabase'}save.disabled=false}
+function saveSession(s){session=s;if(s)sessionStorage.setItem('printa_admin_auth',JSON.stringify(s));else sessionStorage.removeItem('printa_admin_auth')}
+async function rpc(fn,obj={}){
+ if(!session?.admin_token)throw Error('افتح الرابط الخاص بالإدارة');
+ const r=await fetch(U+'/rest/v1/rpc/'+fn,{method:'POST',headers:{apikey:K,'x-printa-admin-token':session.admin_token,'Content-Type':'application/json'},body:JSON.stringify(obj)});
+ const data=await r.json();if(!r.ok)throw Error(data.message||'تعذر الاتصال');return data;
+}
+async function activateBank(){
+ if(!/^https?:$/.test(location.protocol)){el('activationStatus').textContent='بعد رفع الملفين سيتم إغلاق مسارات المحاولات القديمة تلقائيًا عند دخول الأدمن.';return}
+ try{const r=await fetch('../game/index.html?v='+Date.now(),{cache:'no-store'});const html=await r.text();
+ if(!r.ok||!html.includes('2026-10-07-server-bank-1'))throw Error('ارفع ملف اللعبة الجديد في game/index.html أولًا.');
+ await rpc('admin_activate_game_bank');el('activationStatus').textContent='✅ البنك متصل بالسيرفر، ومسارات تعديل المحاولات القديمة مغلقة.';
+ }catch(e){el('activationStatus').textContent='تفعيل الحماية لم يكتمل: '+explain(e)}
+}
+async function enter(){bank=await rpc('get_game_gift_bank');el('authCard').hidden=true;el('controls').hidden=false;draw();await loadSpins();await activateBank()}
+el('logout').onclick=()=>{saveSession(null);el('controls').hidden=true;el('authCard').hidden=false;customer=null;el('customer').textContent=''};
+async function search(){const p=norm(el('phone').value);if(!/^01\d{9}$/.test(p))throw Error('راجع رقم الموبايل');customer=await rpc('admin_game_customer',{p_phone:p});el('customer').textContent=customer.name+' — الرصيد الحالي: '+customer.attempts+' محاولة';return p}
+el('search').onclick=async()=>{el('search').disabled=true;try{await search();el('msg').textContent='';await loadSpins(customer.phone)}catch(e){el('msg').textContent=explain(e)}finally{el('search').disabled=false}};
+el('add').onclick=async()=>{el('add').disabled=true;el('msg').textContent='جاري الإضافة…';try{const p=norm(el('phone').value),amount=Number(el('attemptCount').value);if(!/^01\d{9}$/.test(p)||!Number.isInteger(amount)||amount<1||amount>1000000)throw Error('أدخل رقمًا صحيحًا وعددًا من 1 إلى 1000000');
+ const body=JSON.stringify({p,amount});if(!pendingAdd||pendingAdd.body!==body)pendingAdd={body,id:crypto.randomUUID()};
+ const n=await rpc('admin_add_game_attempts',{p_phone:p,p_attempts:amount,p_request_id:pendingAdd.id});pendingAdd=null;await search();el('msg').textContent='✅ تمت الإضافة — الرصيد الآن '+n+' محاولة';
+ }catch(e){el('msg').textContent=explain(e)}finally{el('add').disabled=false}};
+function draw(){
+ const host=el('gifts');host.replaceChildren();
+ const totalWeight=bank.filter(g=>g.enabled&&(g.remaining===null||g.remaining>0)).reduce((n,g)=>n+Number(g.probability),0);
+ for(const g of bank){
+  const d=document.createElement('div');d.className='gift';d.dataset.id=g.id;
+  const title=document.createElement('b');title.textContent=g.prize.icon+' '+g.prize.fullName;d.append(title);
+  const stats=document.createElement('small');stats.textContent='المصروف بالفوز: '+g.awarded+' | المسلّم: '+g.redeemed+' | المتبقي للفوز: '+(g.remaining===null?'غير محدود':g.remaining);d.append(stats);
+  const fields=document.createElement('div');fields.className='fields';
+  fields.innerHTML='<label>تشغيل <input class="en" type="checkbox"></label><label>وزن الاحتمال <input class="prob" type="number" min="0" max="1000000" step="any"></label><label>الحد الإجمالي للفوز <input class="qty" type="number" min="0" step="1" placeholder="غير محدود"></label>';
+  fields.querySelector('.en').checked=g.enabled;fields.querySelector('.prob').value=g.probability;fields.querySelector('.qty').value=g.total_quantity===null?'':g.total_quantity;
+  if(['extra_attempt','no_prize'].includes(g.prize.type)){fields.querySelector('.qty').disabled=true;fields.querySelector('.qty').placeholder='لا يحتاج مخزونًا'}
+  d.append(fields);const chance=document.createElement('small');chance.textContent='الاحتمال الحالي قبل قيود الدور: '+(g.enabled&&(g.remaining===null||g.remaining>0)&&totalWeight?100*g.probability/totalWeight:0).toFixed(2)+'%';d.append(chance);host.append(d);
+ }
+}
+el('reloadBank').onclick=async()=>{try{bank=await rpc('get_game_gift_bank');draw();el('bankmsg').textContent='تم تحديث البنك من السيرفر'}catch(e){el('bankmsg').textContent=explain(e)}};
+el('save').onclick=async()=>{el('save').disabled=true;el('bankmsg').textContent='جاري الحفظ…';try{
+ const changes=[...document.querySelectorAll('#gifts .gift')].map(d=>{const g=bank.find(x=>x.id===d.dataset.id),q=d.querySelector('.qty').value.trim(),weight=Number(d.querySelector('.prob').value),limit=q===''?null:Number(q);if(!Number.isFinite(weight)||weight<0||weight>1000000||(limit!==null&&(!Number.isInteger(limit)||limit<g.awarded)))throw Error('راجع الاحتمال والحد الإجمالي: '+g.prize.fullName);return{id:g.id,enabled:d.querySelector('.en').checked,probability:weight,total_quantity:limit,revision:g.revision}});
+ const body=JSON.stringify(changes);if(!pendingSave||pendingSave.body!==body)pendingSave={body,id:crypto.randomUUID()};bank=await rpc('admin_save_game_prizes',{p_changes:changes,p_request_id:pendingSave.id});pendingSave=null;draw();el('bankmsg').textContent='✅ تم حفظ البنك على Supabase؛ اللعبة ستقرأه من السيرفر';
+ }catch(e){el('bankmsg').textContent=explain(e)}finally{el('save').disabled=false}};
+async function loadSpins(phone=null){const rows=await rpc('admin_game_spins',{p_phone:phone});const host=el('spins');host.replaceChildren();if(!rows.length){host.textContent='لا توجد جوائز مسجلة بعد';return}for(const s of rows){const d=document.createElement('div');d.className='spinRow';const label=document.createElement('span');label.textContent=s.phone+' — '+s.prize.icon+' '+s.prize.fullName+' — '+new Date(s.created_at).toLocaleString('ar-EG')+' — مرجع الدور: '+(s.round_id||s.id);d.append(label);const btn=document.createElement('button');btn.textContent=s.redeemed_at?'تم التسليم ✅':'تسجيل التسليم';btn.disabled=!!s.redeemed_at;btn.onclick=async()=>{btn.disabled=true;try{await rpc('admin_redeem_game_spin',{p_spin_id:s.id});await loadSpins(phone);bank=await rpc('get_game_gift_bank');draw()}catch(e){btn.disabled=false;el('historymsg').textContent=explain(e)}};d.append(btn);host.append(d)}}
+el('reloadSpins').onclick=()=>loadSpins(customer?.phone||null).catch(e=>el('historymsg').textContent=explain(e));
+try{session=JSON.parse(sessionStorage.getItem('printa_admin_auth')||'null')}catch(e){}
+const callback=new URLSearchParams(location.hash.slice(1));
+if(callback.has('admin')){saveSession({admin_token:callback.get('admin')});history.replaceState(null,'',location.pathname+location.search)}
+if(session)enter().catch(e=>{saveSession(null);el('authmsg').textContent=explain(e)});
+
 </script></body></html>
