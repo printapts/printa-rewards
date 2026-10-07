@@ -421,14 +421,16 @@ async function spin(strength=.5){
  if(spinning||tries<=0)return;
  spinning=true;prStateVersion++;const btn=document.getElementById('btn');btn.disabled=true;updateClaimCard();
  let data;
- try{data=await prPlayServerAttempt();prSyncPrizes(data.prizes)}
+ try{data=await prPlayServerAttempt()}
  catch(e){spinning=false;
   if(e.message.includes('NO_ATTEMPTS'))tries=0;
   if(e.message.includes('ROUND_EXPIRED'))document.getElementById('prPhoneGate').classList.remove('hide');
   if(['NO_ATTEMPTS','NO_AVAILABLE_PRIZES','ROUND_EXPIRED'].some(x=>e.message.includes(x))){prPendingSpin=null;prSaveGameState()}
   updateAttempts();btn.disabled=tries===0;updateClaimCard();document.getElementById('result').textContent=e.message.includes('NO_ATTEMPTS')?'مفيش محاولات متاحة حاليًا 🎡':e.message.includes('NO_AVAILABLE_PRIZES')?'الجوائز غير متاحة حاليًا. رصيدك محفوظ.':'تعذر تأكيد اللفة. اضغط مرة أخرى لاستعادة نفس النتيجة.';return;
  }
- const prizes=activePrizes(),prize=data.prize,index=prizes.findIndex(p=>p.id===prize.id),step=360/prizes.length;
+ const prize=data.prize;
+ if(!activePrizes().some(p=>p.id===prize.id)){prizeConfig.push({...prize,enabled:true});buildWheel()}
+ const prizes=activePrizes(),index=prizes.findIndex(p=>p.id===prize.id),step=360/prizes.length;
  const target=(360-(index+.5)*step)%360,current=((rot%360)+360)%360,delta=(target-current+360)%360;
  const spinDuration=Math.round(3000+strength*2400);
  const fullTurns=3+Math.round(strength*4);rot+=fullTurns*360+delta;
@@ -438,7 +440,7 @@ async function spin(strength=.5){
  prSpinSound(spinDuration,strength);setTimeout(prWinSound,spinDuration+20);
  setTimeout(()=>{
   if(!prCompletedSpinIds.has(data.spin_id)&&prize.type!=='no_prize'&&prize.type!=='extra_attempt')wins.push(prize);
-  prCompletedSpinIds.add(data.spin_id);prPendingSpin=null;
+  prCompletedSpinIds.add(data.spin_id);prPendingSpin=null;prSyncPrizes(data.prizes);
   updateClaimCard();showPrize(prize);
   if(prize.type==='no_prize')setTimeout(prNearMiss,80);else setTimeout(()=>prCelebration(prize.celebration||'normal'),80);
   updateAttempts();prSaveGameState();
@@ -587,7 +589,7 @@ function prApplause(level="special"){
  }
  function down(e){
   if(active||btn.disabled||spinning||tries<=0)return;
-  active=true;start=performance.now();btn.classList.add('charging');btn.setPointerCapture?.(e.pointerId);paint();
+  active=true;start=performance.now();btn.classList.add('charging');try{btn.setPointerCapture?.(e.pointerId)}catch(e){}paint();
  }
  function up(){
   if(!active)return;active=false;cancelAnimationFrame(raf);btn.classList.remove('charging');
@@ -597,7 +599,8 @@ function prApplause(level="special"){
   spin(strength);
  }
  btn.addEventListener('pointerdown',down);
- btn.addEventListener('pointerup',up);
+ window.addEventListener('pointerup',up);
+ btn.addEventListener('click',e=>{if(e.detail===0&&!active)spin(.5)});
  btn.addEventListener('pointercancel',()=>{
   active=false;cancelAnimationFrame(raf);btn.classList.remove('charging');
   btn.style.setProperty('--charge',0);hint.textContent='اضغط واستمر للشحن ⚡';
