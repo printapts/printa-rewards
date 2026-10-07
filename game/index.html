@@ -1,4 +1,4 @@
-<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Printa Wheel</title><meta name="printa-build" content="2026-10-07-layout-2"><style>
+<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Printa Wheel</title><meta name="printa-build" content="2026-10-07-server-bank-1"><style>
 body{font-family:Arial;background:#fff2f7;text-align:center;color:#28233b;margin:0}.box{max-width:480px;margin:auto;padding:20px}.card{background:white;padding:20px;border-radius:25px;box-shadow:0 10px 30px #0002}.logo{font-size:34px;font-weight:bold;color:#e73576}.wheel{width:330px;height:330px;max-width:85vw;max-height:85vw;border-radius:50%;margin:20px auto;border:10px solid #ffc847;background:conic-gradient(#ffd45a 0 60deg,#ff7ca7 60deg 120deg,#75d9d0 120deg 180deg,#a990ee 180deg 240deg,#ffad62 240deg 300deg,#ffdf47 300deg);position:relative;transition:transform 4s cubic-bezier(.1,.7,.1,1);box-shadow:0 8px 20px #0003}.wheel:after{content:"🎁";position:absolute;inset:50% auto auto 50%;transform:translate(-50%,-50%);background:white;border:7px solid #ffc847;border-radius:50%;width:65px;height:65px;display:grid;place-items:center;font-size:27px}.pointer{font-size:42px;color:#e73576;height:25px;position:relative;z-index:2}.labels{position:absolute;inset:0}.l{position:absolute;font-weight:bold;font-size:15px;width:120px}.a{top:55px;right:25px}.b{top:155px;right:0}.c{bottom:48px;right:42px}.d{bottom:48px;left:35px}.e{top:155px;left:0}.f{top:55px;left:28px}button{background:#e73576;color:white;border:0;border-radius:18px;padding:14px 28px;font-size:20px;font-weight:bold;cursor:pointer}.result{font-size:20px;font-weight:bold;min-height:55px;margin:16px}.wins{background:#f6f3ff;padding:12px;border-radius:15px;text-align:right}
 *{box-sizing:border-box}body{min-height:100vh;background:radial-gradient(ellipse at 10% 20%,#f9dce8,transparent 45%),radial-gradient(ellipse at 90% 70%,#dfede7,transparent 50%),#f7f3ee;font-family:Tahoma,Arial,sans-serif;overflow-x:hidden}body:before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.15;background:linear-gradient(90deg,transparent 97%,#a79ba7 97%) 0 0/85px 85px,linear-gradient(transparent 97%,#a79ba7 97%) 0 0/85px 85px}.box{position:relative;max-width:480px;padding:22px 16px}.brand{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px}.logo{font-family:Arial;font-weight:900;letter-spacing:-1.5px;font-size:36px;direction:ltr}.brand small{color:#8d7a90;font-size:11px;border:1px solid white;border-radius:20px;padding:8px;background:#ffffff80}.intro h1{font-size:25px;margin:8px 0}.intro p{font-size:13px;color:#88768c;margin:0 0 22px;line-height:1.8}.card{padding:18px 14px;border:1px solid white;background:linear-gradient(145deg,#ffffffef,#ffffffb8);box-shadow:0 20px 50px #49324b15;border-radius:30px}.grand{background:linear-gradient(110deg,#fff1ce,#fffcf5);border:1px solid #ecd9a6;border-radius:15px;padding:12px;font-size:14px;color:#805b28}.grand small{display:block;color:#a18a5b;font-size:10px;margin-bottom:5px}.stage{position:relative;padding-bottom:12px;margin-top:10px}.pointer{line-height:1;font-size:35px;height:28px;filter:drop-shadow(0 3px 1px #75224055)}.rim{width:min(330px,calc(100vw - 76px));height:min(330px,calc(100vw - 76px));padding:10px;margin:auto;border-radius:50%;background:conic-gradient(from 20deg,#875213,#fff0a1,#cb902b,#fff0a1,#9a641a,#f9d988,#875213);box-shadow:0 9px 0 #a57329,0 14px 0 #704622,0 22px 25px #503b4038,inset 0 2px 4px #fff9;position:relative}.rim:after{content:"";position:absolute;inset:5px;border:1px solid #ffffff90;border-radius:50%;pointer-events:none}.wheel{width:100%;height:100%;max-width:none;max-height:none;margin:0;border:3px solid #fff0bd;box-shadow:inset 0 0 16px #75411b44}.wheel:after{width:58px;height:58px;border:5px solid #eab548;box-shadow:0 4px 9px #65442e55;background:linear-gradient(145deg,white,#fff0cc);font-size:24px}.l{width:39%;font-size:clamp(10px,3.2vw,14px);line-height:1.4}.a{top:17%;right:7%}.b{top:47%;right:0}.c{bottom:15%;right:11%}.d{bottom:15%;left:10%}.e{top:47%;left:0}.f{top:17%;left:8%}.mascot{position:absolute;left:-5px;bottom:-7px;width:87px;height:104px;z-index:3;transform:rotate(-9deg);filter:drop-shadow(0 7px 4px #37273522);pointer-events:none}.attempts{display:flex;justify-content:space-between;align-items:center;margin:18px 0 13px;background:#f6f2f7;border:1px solid #ede4ee;border-radius:15px;padding:12px 14px;text-align:right;font-size:12px}.attempts small{display:block;color:#948699;font-size:10px;margin-top:4px}.dots{display:flex;gap:8px;direction:ltr}.dot{width:22px;height:22px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#ff9bb9,#e73576 70%);box-shadow:0 0 0 3px #f8dfe8;transition:.25s}.dot.off{background:#dcd5df;box-shadow:inset 0 2px 3px #90839733;transform:scale(.85)}button{width:100%;min-height:57px;font-size:19px;padding:14px 8px;background:linear-gradient(135deg,#ed4384,#ce2467);box-shadow:0 5px 0 #a61d52,0 9px 18px #dc357533;border-radius:16px}button:active{transform:translateY(2px)}button:disabled{opacity:.55;cursor:default}button:focus-visible{outline:3px solid #9462cb;outline-offset:5px}.result{font-size:13px;line-height:1.8;color:#88758f;min-height:45px;margin:16px 0 8px}.latest{display:flex;gap:12px;align-items:center;text-align:right;padding:15px;border:1px solid #edddb5;border-radius:17px;background:linear-gradient(110deg,#fff4d8,#fffdf8)}.latest small{display:block;color:#9b855a;font-size:10px;margin-bottom:6px}.latest strong{font-size:15px}.gift{width:40px;height:40px;border-radius:12px;background:#f7e6b5;display:grid;place-items:center;font-size:22px}.wins{background:transparent;padding:12px 0 0;font-size:12px;line-height:1.9}.wins summary{cursor:pointer;color:#96869e}#wins{padding-top:8px}.footer{margin:18px 0 0;color:#a493a5;font-size:10px}.footer span{color:#e73576}.confetti-layer{position:fixed;inset:0;z-index:50;pointer-events:none;overflow:hidden}.confetti{position:absolute;top:-20px;width:8px;height:13px;animation:fall var(--duration) ease-in forwards}@keyframes fall{to{transform:translate(var(--drift),105vh) rotate(720deg);opacity:0}}.celebrate{animation:glow .6s ease-in-out 3}@keyframes glow{50%{box-shadow:0 0 24px #eebd5577;transform:scale(1.02)}}@media(prefers-reduced-motion:reduce){.confetti{display:none}.celebrate{animation:none}}@media(max-width:350px){.mascot{width:70px}.intro h1{font-size:22px}}
 
@@ -299,7 +299,7 @@ html,body{width:100%;max-width:100%;overflow-x:hidden!important}
     "celebration": "major"
   }
 ]</script><script>
-let tries=0,rot=0,wins=[],spinning=false,sessionWonIds=new Set();
+let tries=0,rot=0,wins=[],spinning=false;
 const INITIAL_TRIES=5;
 let prizeConfig=validatePrizeConfig(JSON.parse(document.getElementById('prize-config').textContent));
 
@@ -310,64 +310,64 @@ function prNormPhone(v){
  const a='٠١٢٣٤٥٦٧٨٩',p='۰۱۲۳۴۵۶۷۸۹';
  return String(v||'').trim().replace(/[٠-٩]/g,d=>String(a.indexOf(d))).replace(/[۰-۹]/g,d=>String(p.indexOf(d))).replace(/\D/g,'');
 }
-function prStateKey(){return 'printa_game_'+prCurrentPhone}
+let prRound=null,prPendingSpin=null,prCompletedSpinIds=new Set(),prStateVersion=0;
 function prSaveGameState(){
- if(!prCurrentPhone)return;
- localStorage.setItem(prStateKey(),JSON.stringify({premium:[...sessionWonIds]}));
+ if(prRound)sessionStorage.setItem('printa_server_round',JSON.stringify(prRound));
+ if(prPendingSpin)sessionStorage.setItem('printa_pending_spin',prPendingSpin);else sessionStorage.removeItem('printa_pending_spin');
+}
+async function prRpc(fn,args={}){
+ const r=await fetch(PR_SB_URL+'/rest/v1/rpc/'+fn,{method:'POST',headers:{apikey:PR_SB_KEY,'Content-Type':'application/json'},body:JSON.stringify(args)});
+ const data=await r.json();if(!r.ok)throw new Error(data.message||'SERVER_ERROR');return data;
+}
+function prReadAttempts(value){if(!Number.isInteger(value)||value<0)throw new Error('INVALID_ATTEMPTS');return value}
+function prSyncPrizes(list){
+ prizeConfig=list.length?validatePrizeConfig(list):[];buildWheel();
+}
+function prApplyRoundState(data){
+ tries=prReadAttempts(data.attempts);wins=Array.isArray(data.wins)?data.wins:[];
+ prCompletedSpinIds=new Set(data.spin_ids||[]);if((data.request_ids||[]).includes(prPendingSpin))prPendingSpin=null;prSyncPrizes(data.prizes);prSaveGameState();
+ updateClaimCard();updateAttempts();document.getElementById('btn').disabled=tries===0||!activePrizes().length;
 }
 async function prLoadGameState(phone,name){
- prCurrentPhone=phone;
- let st=null;try{st=JSON.parse(localStorage.getItem(prStateKey())||'null')}catch(e){}
- wins=[];
- sessionWonIds=new Set(st&&Array.isArray(st.premium)?st.premium:[]);
- const rr=await fetch(PR_SB_URL+'/rest/v1/rpc/get_game_attempts',{method:'POST',
-  headers:{apikey:PR_SB_KEY,'Content-Type':'application/json'},body:JSON.stringify({p_phone:phone})});
- if(!rr.ok)throw new Error('attempts');
- tries=prReadAttempts(await rr.json());
- document.getElementById('prPlayerName').textContent='👋 '+(name||'عميل Printa');
- document.getElementById('prPlayerPhone').textContent=phone;
- document.getElementById('prPhoneGate').classList.add('hide');
- updateClaimCard();updateAttempts();
- document.getElementById('btn').disabled=tries===0;
+ prStateVersion++;const data=await prRpc('begin_game_round',{p_phone:phone});
+ prRound={id:data.round_id,token:data.token,phone:data.phone,name:data.name};prCurrentPhone=phone;prPendingSpin=null;
+ prApplyRoundState(data);prSaveGameState();prShowPlayer();
  document.getElementById('result').textContent=tries?('عندك '+tries+' محاولات… يلا!'):'مفيش محاولات متاحة حاليًا 🎡';
 }
-// The RPC atomically consumes one attempt and credits the bonus; never adjust tries locally.
-function prReadAttempts(value,allowEmpty=false){
- if(!Number.isInteger(value)||value<(allowEmpty?-1:0))throw new Error('invalid_attempts');
- return value;
+function prShowPlayer(){
+ document.getElementById('prPlayerName').textContent='👋 '+prRound.name;
+ document.getElementById('prPlayerPhone').textContent=prRound.phone;document.getElementById('prPhoneGate').classList.add('hide');
 }
-async function prPlayServerAttempt(bonus=0){
- const r=await fetch(PR_SB_URL+'/rest/v1/rpc/play_game_attempt',{method:'POST',
-  headers:{apikey:PR_SB_KEY,'Content-Type':'application/json'},
-  body:JSON.stringify({p_phone:prCurrentPhone,p_bonus:bonus})});
- if(!r.ok)throw new Error('play_attempt');
- const left=prReadAttempts(await r.json(),true);
- if(left<0)return false;
- tries=left; updateAttempts(); return true;
+async function prPlayServerAttempt(){
+ if(!prRound)throw new Error('ROUND_EXPIRED');
+ if(!prPendingSpin)prPendingSpin=crypto.randomUUID();prSaveGameState();
+ const data=await prRpc('play_game_spin',{p_round_id:prRound.id,p_token:prRound.token,p_request_id:prPendingSpin});
+ tries=prReadAttempts(data.attempts);updateAttempts();return data;
 }
 async function prRefreshServerAttempts(){
- const r=await fetch(PR_SB_URL+'/rest/v1/rpc/get_game_attempts',{method:'POST',
-  headers:{apikey:PR_SB_KEY,'Content-Type':'application/json'},
-  body:JSON.stringify({p_phone:prCurrentPhone})});
- if(!r.ok)throw new Error('get_attempts');
- tries=prReadAttempts(await r.json()); updateAttempts(); return tries;
+ if(!prRound||spinning)return tries;
+ const id=prRound.id,version=prStateVersion;const data=await prRpc('get_game_round',{p_round_id:id,p_token:prRound.token});
+ if(spinning||prRound?.id!==id||version!==prStateVersion)return tries;prApplyRoundState(data);return tries;
 }
 async function prGameLogin(){
  const phone=prNormPhone(document.getElementById('prGamePhone').value),st=document.getElementById('prLoginStatus'),b=document.getElementById('prGameLogin');
  if(!/^01\d{9}$/.test(phone)){st.textContent='راجع رقم الموبايل — لازم يكون 11 رقم ويبدأ بـ 01';return}
  st.textContent='بنتأكد من حسابك…';b.disabled=true;
- try{
-  const r=await fetch(PR_SB_URL+'/rest/v1/rpc/get_customer_by_phone',{method:'POST',
-   headers:{apikey:PR_SB_KEY,'Content-Type':'application/json'},body:JSON.stringify({p_phone:phone})});
-  if(!r.ok)throw new Error('http');
-  const rows=await r.json();
-  if(!rows.length){st.textContent='الرقم ده مش مسجل عند برينتا.';b.disabled=false;return}
-  await prLoadGameState(phone,rows[0].customer_name||'عميل Printa');st.textContent='';
- }catch(e){st.textContent='تعذر الاتصال دلوقتي. جرّب تاني.';b.disabled=false}
+ try{await prLoadGameState(phone,'');st.textContent=''}catch(e){st.textContent=e.message.includes('CUSTOMER_NOT_FOUND')?'الرقم ده مش مسجل عند برينتا.':'تعذر الاتصال دلوقتي. جرّب تاني.'}finally{b.disabled=false}
+}
+async function prRestoreRound(){
+ try{prRound=JSON.parse(sessionStorage.getItem('printa_server_round')||'null');prPendingSpin=sessionStorage.getItem('printa_pending_spin');
+ if(prRound){prCurrentPhone=prRound.phone;await prRefreshServerAttempts();prShowPlayer()}}
+ catch(e){prRound=null;tries=0;document.getElementById('btn').disabled=true;document.getElementById('prLoginStatus').textContent='تعذر استعادة الدور. أدخل رقمك لبدء دور جديد.'}
 }
 document.getElementById('prGameLogin').addEventListener('click',prGameLogin);
 document.getElementById('prGamePhone').addEventListener('keydown',e=>{if(e.key==='Enter')prGameLogin()});
-
+window.addEventListener('focus',()=>{if(prRound&&!spinning)prRefreshServerAttempts().catch(()=>{})});
+setInterval(()=>{if(prRound&&!spinning&&!document.hidden)prRefreshServerAttempts().catch(()=>{})},30000);
+const prNewRound=document.createElement('button');prNewRound.id='prNewRound';prNewRound.textContent='دور جديد';prNewRound.type='button';
+prNewRound.style.cssText='width:auto;min-height:0;padding:4px 7px;font-size:11px;box-shadow:none;margin:0';
+prNewRound.onclick=()=>{if(spinning)return;prStateVersion++;prRound=null;prPendingSpin=null;wins=[];tries=0;sessionStorage.removeItem('printa_server_round');sessionStorage.removeItem('printa_pending_spin');updateClaimCard();updateAttempts();document.getElementById('prPhoneGate').classList.remove('hide')};
+document.querySelector('.prPlayerBar').append(prNewRound);
 function validatePrizeConfig(input){
  if(!Array.isArray(input)||input.length===0)throw new Error('قائمة الجوائز فارغة');
  const ids=new Set(),types=new Set(['price','points','paper','discount','pen','gift','extra_attempt','no_prize']);
@@ -392,14 +392,6 @@ function buildWheel(){
  wheel.setAttribute('aria-label','عجلة الجوائز: '+prizes.map(p=>p.fullName).join('، '));
 
 }
-function pick(prizes=activePrizes()){
- // Big-value rewards are one-per-session; small rewards may repeat.
- const premiumTypes=new Set(['price','discount']);
- const eligible=prizes.map((p,i)=>({p,i})).filter(x=>!(premiumTypes.has(x.p.type)&&sessionWonIds.has(x.p.id)));
- const total=eligible.reduce((sum,x)=>sum+x.p.probability,0),r=Math.random()*total;let sum=0;
- for(const x of eligible){sum+=x.p.probability;if(r<sum)return x.i}
- return eligible[eligible.length-1].i;
-}
 function updateClaimCard(){
  const box=document.getElementById('claimSummary'),btn=document.getElementById('claimBtn');
  if(!box||!btn)return;
@@ -420,20 +412,23 @@ function sendPrintaWhatsApp(){
  const grouped=new Map();
  redeemable.forEach(p=>{if(!grouped.has(p.id))grouped.set(p.id,{p,count:0});grouped.get(p.id).count++});
  const lines=[...grouped.values()].map(x=>`${x.p.icon} ${x.p.fullName}${x.count>1?` × ${x.count}`:''}`);
- const msg=['أهلاً برينتا 👋','أنا خلصت لعبة Printa 🎡','ومكاسبي هي:',...lines,'','عايز أستلم مكاسبي 🎁'].join('\n');
+ const msg=['أهلاً برينتا 👋','أنا خلصت لعبة Printa 🎡','رقم العميل: '+prCurrentPhone,'مرجع الدور: '+(prRound?.id||''),'ومكاسبي هي:',...lines,'','عايز أستلم مكاسبي 🎁'].join('\n');
  window.open('https://wa.me/201202662255?text='+encodeURIComponent(msg),'_blank','noopener');
  updateClaimCard();
 }
 document.getElementById('claimBtn')?.addEventListener('click',sendPrintaWhatsApp);
 async function spin(strength=.5){
  if(spinning||tries<=0)return;
- spinning=true;const btn=document.getElementById('btn');btn.disabled=true;updateClaimCard();
- const prizes=activePrizes(),index=pick(prizes),prize={...prizes[index]},step=360/prizes.length;
- const bonus=prize.type==='extra_attempt'?prize.value:0;
- try{
-  const ok=await prPlayServerAttempt(bonus);
-  if(!ok){spinning=false;tries=0;updateAttempts();updateClaimCard();btn.disabled=true;document.getElementById('result').textContent='مفيش محاولات متاحة حاليًا 🎡';return}
- }catch(e){spinning=false;btn.disabled=tries===0;updateClaimCard();document.getElementById('result').textContent='حصلت مشكلة في تسجيل المحاولة. جرّب تاني.';return}
+ spinning=true;prStateVersion++;const btn=document.getElementById('btn');btn.disabled=true;updateClaimCard();
+ let data;
+ try{data=await prPlayServerAttempt();prSyncPrizes(data.prizes)}
+ catch(e){spinning=false;
+  if(e.message.includes('NO_ATTEMPTS'))tries=0;
+  if(e.message.includes('ROUND_EXPIRED'))document.getElementById('prPhoneGate').classList.remove('hide');
+  if(['NO_ATTEMPTS','NO_AVAILABLE_PRIZES','ROUND_EXPIRED'].some(x=>e.message.includes(x))){prPendingSpin=null;prSaveGameState()}
+  updateAttempts();btn.disabled=tries===0;updateClaimCard();document.getElementById('result').textContent=e.message.includes('NO_ATTEMPTS')?'مفيش محاولات متاحة حاليًا 🎡':e.message.includes('NO_AVAILABLE_PRIZES')?'الجوائز غير متاحة حاليًا. رصيدك محفوظ.':'تعذر تأكيد اللفة. اضغط مرة أخرى لاستعادة نفس النتيجة.';return;
+ }
+ const prizes=activePrizes(),prize=data.prize,index=prizes.findIndex(p=>p.id===prize.id),step=360/prizes.length;
  const target=(360-(index+.5)*step)%360,current=((rot%360)+360)%360,delta=(target-current+360)%360;
  const spinDuration=Math.round(3000+strength*2400);
  const fullTurns=3+Math.round(strength*4);rot+=fullTurns*360+delta;
@@ -442,17 +437,17 @@ async function spin(strength=.5){
  wheel.style.transform='rotate('+rot+'deg)';
  prSpinSound(spinDuration,strength);setTimeout(prWinSound,spinDuration+20);
  setTimeout(()=>{
-  if(['price','discount'].includes(prize.type))sessionWonIds.add(prize.id);
-  if(prize.type!=='no_prize'&&prize.type!=='extra_attempt')wins.push(prize);
+  if(!prCompletedSpinIds.has(data.spin_id)&&prize.type!=='no_prize'&&prize.type!=='extra_attempt')wins.push(prize);
+  prCompletedSpinIds.add(data.spin_id);prPendingSpin=null;
   updateClaimCard();showPrize(prize);
   if(prize.type==='no_prize')setTimeout(prNearMiss,80);else setTimeout(()=>prCelebration(prize.celebration||'normal'),80);
   updateAttempts();prSaveGameState();
   document.getElementById('result').textContent=(prize.type==='no_prize'?'':'🎉 كسبت ')+prize.icon+' '+prize.shortName+(tries?' — باقي '+tries+' محاولة':' — خلصت محاولاتك!');
-  spinning=false;btn.disabled=tries===0;updateClaimCard();
+  spinning=false;btn.disabled=tries===0;updateClaimCard();prRefreshServerAttempts().catch(()=>{});
  },spinDuration+100);
 }
 function updateAttempts(){
- const dots=document.querySelector('.dots'),count=Math.max(INITIAL_TRIES,tries);dots.replaceChildren();
+ const dots=document.querySelector('.dots'),count=Math.min(20,Math.max(INITIAL_TRIES,tries));dots.replaceChildren();
  for(let i=0;i<count;i++){const dot=document.createElement('i');dot.className='dot'+(i>=tries?' off':'');dots.appendChild(dot)}
  document.getElementById('tries-label').textContent=tries+' محاولات متاحة';dots.setAttribute('aria-label',tries+' محاولات متبقية');
 }
@@ -466,13 +461,7 @@ function showPrize(prize){
  const layer=document.getElementById('confetti-layer'),colors=['#e73576','#efbd48','#60c9c4','#a48adc'],count={none:0,normal:38,special:75,major:110}[prize.celebration];
  for(let n=0;n<count;n++){const piece=document.createElement('i');piece.className='confetti';piece.style.left=(n*37%100)+'%';piece.style.background=colors[n%4];piece.style.setProperty('--duration',(2.3+n%9*.13)+'s');piece.style.setProperty('--drift',((n%2?1:-1)*(20+n%80))+'px');piece.style.animationDelay=(n%7*.055)+'s';layer.appendChild(piece);piece.addEventListener('animationend',()=>piece.remove(),{once:true})}
 }
-// Integration point for a future private admin page or server-backed configuration.
-window.PrintaPrizes=Object.freeze({
- getConfig:()=>prizeConfig.map(p=>({...p})),
- setConfig:(next)=>{if(spinning)throw new Error('انتظر انتهاء الدوران قبل تغيير الجوائز');const validated=validatePrizeConfig(next);prizeConfig=validated;rot=0;document.getElementById('wheel').style.transform='rotate(0deg)';buildWheel()},
- getEffectiveProbabilities:()=>{const list=activePrizes(),total=list.reduce((s,p)=>s+p.probability,0);return list.map(p=>({id:p.id,probability:p.probability/total*100}))}
-});
-buildWheel();updateAttempts();
+buildWheel();updateAttempts();prRestoreRound();
 </script>
 <script>
 let prAudioCtx;
@@ -585,247 +574,6 @@ function prApplause(level="special"){
 }
 </script>
 
-<script type="application/json" id="prize-bank">[
-  {
-    "id": "point-one",
-    "shortName": "نقطة",
-    "fullName": "نقطة واحدة",
-    "icon": "⭐",
-    "probability": 21,
-    "type": "points",
-    "value": 1,
-    "enabled": true,
-    "color": "#079acd",
-    "celebration": "normal"
-  },
-  {
-    "id": "paper-five",
-    "shortName": "5 ورقات",
-    "fullName": "5 ورقات هدية",
-    "icon": "🎁",
-    "probability": 16,
-    "type": "paper",
-    "value": 5,
-    "enabled": true,
-    "color": "#ff8a3d",
-    "celebration": "normal"
-  },
-  {
-    "id": "points-two",
-    "shortName": "نقطتين",
-    "fullName": "نقطتين",
-    "icon": "⭐",
-    "probability": 16,
-    "type": "points",
-    "value": 2,
-    "enabled": true,
-    "color": "#8a63d2",
-    "celebration": "normal"
-  },
-  {
-    "id": "near-miss",
-    "shortName": "كانت قريبة!",
-    "fullName": "كانت قريبة! 😅 جرّب فرصتك اللي جاية",
-    "icon": "😅",
-    "probability": 14,
-    "type": "no_prize",
-    "value": 0,
-    "enabled": true,
-    "color": "#02a99a",
-    "celebration": "none"
-  },
-  {
-    "id": "extra-one",
-    "shortName": "+1 محاولة",
-    "fullName": "محاولة إضافية — كمل لعب!",
-    "icon": "🎡",
-    "probability": 10,
-    "type": "extra_attempt",
-    "value": 1,
-    "enabled": true,
-    "color": "#7437e6",
-    "celebration": "normal"
-  },
-  {
-    "id": "paper-ten",
-    "shortName": "10 ورقات",
-    "fullName": "10 ورقات هدية",
-    "icon": "🎁",
-    "probability": 7,
-    "type": "paper",
-    "value": 10,
-    "enabled": true,
-    "color": "#efbd48",
-    "celebration": "special"
-  },
-  {
-    "id": "pen",
-    "shortName": "قلم جاف",
-    "fullName": "قلم جاف هدية",
-    "icon": "🖊️",
-    "probability": 5,
-    "type": "pen",
-    "value": 1,
-    "enabled": true,
-    "color": "#60c9c4",
-    "celebration": "special"
-  },
-  {
-    "id": "extra-two",
-    "shortName": "+2 محاولة",
-    "fullName": "محاولتين إضافيتين — يلا كمل!",
-    "icon": "🎡",
-    "probability": 5,
-    "type": "extra_attempt",
-    "value": 2,
-    "enabled": true,
-    "color": "#ff9f1c",
-    "celebration": "special"
-  },
-  {
-    "id": "discount-five",
-    "shortName": "خصم 5%",
-    "fullName": "خصم 5% على الأوردر القادم",
-    "icon": "🏷️",
-    "probability": 3,
-    "type": "discount",
-    "value": 5,
-    "enabled": true,
-    "color": "#04b9e4",
-    "celebration": "special"
-  },
-  {
-    "id": "next-order-price",
-    "shortName": "65 قرش",
-    "fullName": "سعر الورقة 65 قرش للأوردر القادم",
-    "icon": "🔥",
-    "probability": 3,
-    "type": "price",
-    "value": 0.65,
-    "enabled": true,
-    "color": "#ff075d",
-    "celebration": "major"
-  },
-  {
-    "id": "points-three",
-    "shortName": "3 نقاط",
-    "fullName": "3 نقاط",
-    "icon": "⭐",
-    "type": "points",
-    "value": 3,
-    "color": "#e73576",
-    "celebration": "normal"
-  },
-  {
-    "id": "points-five",
-    "shortName": "5 نقاط",
-    "fullName": "5 نقاط",
-    "icon": "⭐",
-    "type": "points",
-    "value": 5,
-    "color": "#7357d6",
-    "celebration": "special"
-  },
-  {
-    "id": "paper-twentyfive",
-    "shortName": "25 ورقة",
-    "fullName": "25 ورقة هدية",
-    "icon": "🖨️",
-    "type": "paper",
-    "value": 25,
-    "color": "#e55b4d",
-    "celebration": "special"
-  },
-  {
-    "id": "discount-three",
-    "shortName": "خصم 3%",
-    "fullName": "خصم 3% على الأوردر القادم",
-    "icon": "🏷️",
-    "type": "discount",
-    "value": 3,
-    "color": "#18a999",
-    "celebration": "normal"
-  },
-  {
-    "id": "discount-ten",
-    "shortName": "خصم 10%",
-    "fullName": "خصم 10% على الأوردر القادم",
-    "icon": "🏷️",
-    "type": "discount",
-    "value": 10,
-    "color": "#c855a5",
-    "celebration": "major"
-  },
-  {
-    "id": "notebook",
-    "shortName": "نوت بوك",
-    "fullName": "نوت بوك هدية",
-    "icon": "📒",
-    "type": "gift",
-    "value": 1,
-    "color": "#3478bf",
-    "celebration": "special"
-  },
-  {
-    "id": "pencil",
-    "shortName": "قلم رصاص",
-    "fullName": "قلم رصاص هدية",
-    "icon": "✏️",
-    "type": "gift",
-    "value": 1,
-    "color": "#d28c36",
-    "celebration": "normal"
-  },
-  {
-    "id": "sticker",
-    "shortName": "استيكر",
-    "fullName": "استيكر هدية",
-    "icon": "✨",
-    "type": "gift",
-    "value": 1,
-    "color": "#b35fca",
-    "celebration": "normal"
-  },
-  {
-    "id": "extra-three",
-    "shortName": "+3 محاولات",
-    "fullName": "3 محاولات إضافية",
-    "icon": "🎡",
-    "type": "extra_attempt",
-    "value": 3,
-    "color": "#7b61d1",
-    "celebration": "major"
-  },
-  {
-    "id": "paper-fifteen",
-    "shortName": "15 ورقة",
-    "fullName": "15 ورقة هدية",
-    "icon": "🎁",
-    "type": "paper",
-    "value": 15,
-    "color": "#dd7044",
-    "celebration": "special"
-  }
-]</script>
-
-<script id="pr-gift-bank-api">
-(()=>{
- const bank=JSON.parse(document.getElementById('prize-bank').textContent);
- window.PrintaGiftBank=Object.freeze({
-   getAll:()=>JSON.parse(JSON.stringify(bank)),
-   getById:(id)=>JSON.parse(JSON.stringify(bank.find(x=>x.id===id)||null)),
-   replaceSlot:(slotIndex,giftId,probability)=>{
-     const cfg=window.PrintaPrizes.getConfig(),gift=bank.find(x=>x.id===giftId);
-     if(!gift) throw new Error('Gift not found');
-     if(slotIndex<0||slotIndex>=cfg.length) throw new Error('Invalid wheel slot');
-     const oldProbability=cfg[slotIndex].probability;
-     cfg[slotIndex]={...gift,probability:Number.isFinite(probability)?probability:oldProbability,enabled:true};
-     window.PrintaPrizes.setConfig(cfg);
-     return window.PrintaPrizes.getConfig();
-   }
- });
-})();
-</script>
 <script id="charge-controls">
 (()=>{
  const btn=document.getElementById('btn'),hint=document.getElementById('chargeHint');
@@ -855,39 +603,4 @@ function prApplause(level="special"){
   btn.style.setProperty('--charge',0);hint.textContent='اضغط واستمر للشحن ⚡';
  });
 })();
-</script><button id="prBankOpen" onclick="prOpenBank()">🎁 بنك الهدايا</button>
-<div id="prBankPage"><button id="prBankClose" onclick="prCloseBank()">✕ رجوع للعجلة</button>
-<div class="wrap">
- <div class="head"><h1>🎁 إدارة بنك هدايا Printa</h1>
- <div class="sub">دي شاشة الإدارة الخاصة بيك. العميل مش بيشوفها. اختار «استبدال» من جائزة موجودة على العجلة، وبعدها اختار هدية من البنك.</div>
- <div class="stats"><div class="stat"><b id="pr_aCount">10</b>على العجلة</div><div class="stat"><b id="pr_rCount">10</b>احتياطي</div><div class="stat"><b>20</b>إجمالي البنك</div></div>
- </div>
- <section><h2>🎡 على العجلة الآن</h2><div class="hint">الهدايا المفعّلة حاليًا — اضغط استبدال على أي واحدة.</div><div class="grid" id="pr_active"></div></section>
- <section class="reserve"><h2>🎁 بنك الهدايا الاحتياطي</h2><div class="hint">الهدايا الجاهزة للدخول للعجلة وقت ما تحب.</div><div class="grid" id="pr_reserve"></div></section>
-</div><div class="notice" id="pr_notice"></div>
-</div><script>
-const PR_BANK=[{"id": "point-one", "label": "⭐ نقطة واحدة", "type": "points", "value": 1, "tier": "common"}, {"id": "points-two", "label": "⭐ نقطتين", "type": "points", "value": 2, "tier": "common"}, {"id": "paper-five", "label": "🎁 5 ورقات هدية", "type": "paper", "value": 5, "tier": "common"}, {"id": "paper-ten", "label": "🎁 10 ورقات هدية", "type": "paper", "value": 10, "tier": "medium"}, {"id": "pen", "label": "🖊️ قلم جاف", "type": "pen", "value": 1, "tier": "medium"}, {"id": "extra-one", "label": "🎡 +1 محاولة", "type": "extra_attempt", "value": 1, "tier": "common"}, {"id": "extra-two", "label": "🎡 +2 محاولة", "type": "extra_attempt", "value": 2, "tier": "medium"}, {"id": "discount-five", "label": "🏷️ خصم 5%", "type": "discount", "value": 5, "tier": "rare"}, {"id": "next-order-price", "label": "🔥 الورقة بـ65 قرش", "type": "price", "value": 0.65, "tier": "major"}, {"id": "near-miss", "label": "😅 يا خسارة!", "type": "no_prize", "value": 0, "tier": "common"},{"id": "points-three", "label": "⭐ 3 نقاط", "type": "points", "value": 3, "tier": "medium"}, {"id": "points-five", "label": "⭐ 5 نقاط", "type": "points", "value": 5, "tier": "rare"}, {"id": "paper-fifteen", "label": "🖨️ 15 ورقة هدية", "type": "paper", "value": 15, "tier": "rare"}, {"id": "paper-twentyfive", "label": "🖨️ 25 ورقة هدية", "type": "paper", "value": 25, "tier": "rare"}, {"id": "stapler", "label": "دباسة", "type": "gift", "value": "stapler", "tier": "rare"}, {"id": "notebook", "label": "📒 نوت بوك صغير", "type": "gift", "value": "notebook", "tier": "rare"}, {"id": "discount-three", "label": "🏷️ خصم 3%", "type": "discount", "value": 3, "tier": "medium"}, {"id": "extra-three", "label": "🎡 +3 محاولات", "type": "extra_attempt", "value": 3, "tier": "rare"}, {"id": "double-last", "label": "🎁 ضاعف مكسبك السابق ×2", "type": "gift", "value": "double_last", "tier": "special"}, {"id": "choose-reward", "label": "🎯 اختار: نقطتين أو 5 ورقات", "type": "gift", "value": "choose_reward", "tier": "special"}];
-let prActive=PR_BANK.slice(0,10),prReserve=PR_BANK.slice(10),prSlot=null;
-const prTier={common:"شائعة",medium:"متوسطة",rare:"نادرة",special:"مميزة",major:"جائزة كبيرة"};
-function prMeta(g){
- const I={'point-one':'⭐','points-two':'⭐','points-three':'⭐','points-five':'⭐','paper-five':'🎁','paper-ten':'🎁','paper-fifteen':'🖨️','paper-twentyfive':'🖨️','pen':'🖊️','stapler':'▰','notebook':'📒','discount-three':'🏷️','discount-five':'🏷️','extra-one':'🎡','extra-two':'🎡','extra-three':'🎡','next-order-price':'🔥','near-miss':'😅','near-miss-2':'🎯','near-miss-3':'🙈','double-last':'🎁','choose-reward':'🎯'};
- const C={'near-miss':'none','near-miss-2':'none','near-miss-3':'none','next-order-price':'major','paper-twentyfive':'major','pen':'special','stapler':'special','notebook':'special','discount-five':'special','extra-three':'special','double-last':'special','choose-reward':'special'};
- let v=g.value;if(g.type==='gift'){v=({stapler:101,notebook:102,double_last:201,choose_reward:202})[v]||100}
- return {icon:I[g.id]||'🎁',celebration:C[g.id]||'normal',value:Number(v)}
-}
-function prApply(){
- const old=window.PrintaPrizes.getConfig();
- window.PrintaPrizes.setConfig(prActive.map((g,i)=>{const o=old[i]||old[0],m=prMeta(g);return {id:g.id,shortName:g.label.replace(/^[^\p{L}\p{N}+]+/u,'').trim(),fullName:g.label,icon:m.icon,probability:Number(o.probability||10),type:g.type,value:m.value,enabled:true,color:o.color||'#ffd45a',celebration:m.celebration}}))
-}
-function prRender(){
- pr_aCount.textContent=prActive.length;pr_rCount.textContent=prReserve.length;
- pr_active.innerHTML=prActive.map((g,i)=>`<div class="card ${prSlot===i?'selected':''}" onclick="prChoose(${i})"><div class="label">${g.label}</div><div class="tag">${prTier[g.tier]}</div><button class="swap">استبدال</button></div>`).join('');
- pr_reserve.innerHTML=prReserve.map((g,i)=>`<div class="card reserve" onclick="prPick(${i})"><div class="label">${g.label}</div><div class="tag">${prTier[g.tier]}</div><button class="pick">اختيار</button></div>`).join('')
-}
-function prChoose(i){prSlot=i;prRender();prMsg('اختر هدية من البنك الاحتياطي')}
-function prPick(i){if(prSlot===null)return prMsg('اختار الأول جائزة من قسم «على العجلة الآن»');let x=prActive[prSlot];prActive[prSlot]=prReserve[i];prReserve[i]=x;prSlot=null;try{prApply();localStorage.setItem('printa_exact_bank_active',JSON.stringify(prActive));prRender();prMsg('تم الاستبدال ✅')}catch(e){prRender();prMsg('حصل خطأ: '+e.message)}}
-function prMsg(t){pr_notice.textContent=t;pr_notice.style.display='block'}
-function prOpenBank(){prBankPage.classList.add('open')} function prCloseBank(){prBankPage.classList.remove('open')}
-try{let z=JSON.parse(localStorage.getItem('printa_exact_bank_active')||'null');if(Array.isArray(z)&&z.length===10){prActive=z;let ids=new Set(z.map(x=>x.id));prReserve=PR_BANK.filter(x=>!ids.has(x.id));prApply()}}catch(e){console.error(e)}
-document.addEventListener('DOMContentLoaded',prRender);
 </script></body></html>
