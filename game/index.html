@@ -306,7 +306,7 @@ html,body{width:100%;max-width:100%;overflow-x:hidden!important}
     "color": "#ff075d",
     "celebration": "major"
   }
-]</script><script>
+]</script><script src="../customer-session.js?v=20261008"></script><script>
 let tries=0,rot=0,wins=[],spinning=false,prDisplayedPrizeId=null;
 const INITIAL_TRIES=5;
 let prizeConfig=validatePrizeConfig(JSON.parse(document.getElementById('prize-config').textContent));
@@ -389,6 +389,7 @@ async function prLoadGameState(phone,name){
  document.getElementById('result').textContent=tries?('عندك '+tries+' محاولات… يلا!'):'مفيش محاولات متاحة حاليًا 🎡';
 }
 function prShowPlayer(){
+ PrintaCustomer.select(prRound.phone);document.getElementById("prGamePhone").value=prRound.phone;
  document.getElementById("result").textContent=tries?"متاح "+tries+" محاولات في الدور الحالي 🎡":"خلصت محاولات الدور الحالي 🎡";
  document.getElementById('prPlayerName').textContent='👋 '+prRound.name;
  document.getElementById('prPlayerPhone').textContent=prRound.phone;document.getElementById('prPhoneGate').classList.add('hide');
@@ -412,6 +413,8 @@ async function prGameLogin(){
 }
 async function prRestoreRound(){
  try{prRound=JSON.parse(sessionStorage.getItem('printa_server_round')||'null');prPendingSpin=sessionStorage.getItem('printa_pending_spin');
+ const selected=PrintaCustomer.get();if(prRound&&selected&&selected!==prRound.phone){prRound=null;prPendingSpin=null;}
+ if(!prRound&&selected){document.getElementById('prGamePhone').value=selected;await prGameLogin();return;}
  if(prRound){const restoredId=prRound.id,version=prStateVersion;prCurrentPhone=prRound.phone;await prRefreshServerAttempts();if(prRound?.id===restoredId&&version===prStateVersion)prShowPlayer()}}
  catch(e){prRound=null;tries=0;document.getElementById('btn').disabled=true;document.getElementById('prLoginStatus').textContent='تعذر استعادة الدور. أدخل رقمك لبدء دور جديد.'}
 }
