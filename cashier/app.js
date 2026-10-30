@@ -1,24 +1,36 @@
 import {period,freshness} from './report.js';
 const $=id=>document.getElementById(id),config=window.PRINTA_MOBILE||{};
 let session=null,shop=null,snapshot=null,received=null,polling=false;
-let pairing=new URLSearchParams(location.hash.slice(1)).get('pair');
+const callback=new URLSearchParams(location.hash.slice(1));
+let creating=false,recovery=null;
+let pairing=callback.get('pair');
 history.replaceState(null,'',location.pathname+location.search);
 if(pairing&&!/^[a-f0-9]{64}$/.test(pairing))pairing=null;
 const endpoint=String(config.endpoint||'').replace(/\/$/,'');
 const configured=(()=>{try{return new URL(endpoint).protocol==='https:'&&!!config.publishableKey}catch{return false}})();
 function notice(text){$('notice').textContent=text;}
-function clear(){session=null;shop=null;snapshot=null;received=null;$('metrics').replaceChildren();$('trend').replaceChildren();$('dashboard').hidden=$('account').hidden=$('pair').hidden=true;$('login').hidden=false;$('password').value='';}
+function clear(){session=null;shop=null;snapshot=null;received=null;$('metrics').replaceChildren();$('trend').replaceChildren();$('dashboard').hidden=$('account').hidden=$('pair').hidden=true;$('login').hidden=false;$('password').value='';$('recovery').hidden=true;recovery=null;}
 async function request(path,body,auth=false,method=body===undefined?'GET':'POST'){
  const headers={apikey:config.publishableKey,'Content-Type':'application/json'};
  if(auth){if(!session)throw Error('auth');headers.Authorization='Bearer '+session.access_token;}
  const response=await fetch(endpoint+path,{method,headers,body:body===undefined?undefined:JSON.stringify(body),cache:'no-store',referrerPolicy:'no-referrer',redirect:'error',signal:AbortSignal.timeout(15000)});
- if(!response.ok){if((auth&&(response.status===401||response.status===403))||(path.includes('grant_type=refresh_token')&&[400,401,403].includes(response.status))){clear();notice('انتهت الجلسة أو أُلغي الوصول؛ سجّل الدخول مجددًا.');}throw Error(response.status===429?'rate':'request');}
+ if(!response.ok){if((auth&&(response.status===401||response.status===403))||(path.includes('grant_type=refresh_token')&&[400,401,403].includes(response.status))){clear();notice('انتهت الجلسة أو أُلغي الوصول؛ سجّل الدخول مجددًا.');}let errorBody={};try{errorBody=await response.json();}catch{}const code=errorBody.code||errorBody.error_code;const messages={invalid_credentials:'البريد أو كلمة المرور غير صحيحة. لو الحساب اتعمل قبل كده استخدم «نسيت كلمة المرور» بدل إنشاء حساب جديد.',email_not_confirmed:'الحساب اتعمل؛ افتح رسالة تأكيد البريد أولًا، ثم ارجع وسجّل الدخول.',weak_password:'اختَر كلمة مرور أقوى من 8 حروف على الأقل.',user_already_exists:'البريد مسجل بالفعل؛ استخدم الدخول أو نسيت كلمة المرور.',signup_disabled:'إنشاء الحسابات متوقف حاليًا على الخدمة.',email_address_invalid:'راجع كتابة البريد الإلكتروني.',over_email_send_rate_limit:'تم إرسال رسائل كثيرة؛ انتظر قليلًا قبل طلب رسالة أخرى.',over_request_rate_limit:'محاولات كثيرة؛ انتظر قليلًا ثم أعد المحاولة.',otp_expired:'رابط البريد انتهى أو استُخدم بالفعل؛ اطلب رابطًا جديدًا من الصفحة.'};const error=new Error('request');error.userMessage=messages[code]||(response.status===429?'محاولات كثيرة؛ انتظر قليلًا ثم أعد المحاولة.':null);throw error;}
  return response.status===204?null:response.json();
 }
 async function signedIn(value){session={...value,expires_at:Date.now()+value.expires_in*1000};$('password').value='';$('login').hidden=true;$('account').hidden=false;$('pair').hidden=!pairing;await refresh();}
-async function guard(action){document.querySelectorAll('button').forEach(b=>b.disabled=true);try{await action();}catch{if(session)notice('تعذر الاتصال. المعروض هو آخر ملخص مستلم، وليس بيانات لحظية.');else notice('تعذر الدخول؛ راجع الحساب وتأكيد البريد والاتصال.');}finally{document.querySelectorAll('button').forEach(b=>b.disabled=false);if(!configured)$('login-button').disabled=$('signup').disabled=true;}}
-$('login-form').addEventListener('submit',e=>{e.preventDefault();guard(async()=>{const value=await request('/auth/v1/token?grant_type=password',{email:$('email').value.trim(),password:$('password').value});notice('');await signedIn(value);});});
-$('signup').onclick=()=>guard(async()=>{if(!$('login-form').reportValidity())return;await request('/auth/v1/signup',{email:$('email').value.trim(),password:$('password').value});$('password').value='';notice('راجع بريدك لتأكيد الحساب، ثم سجّل الدخول هنا.');});
+async function guard(action){document.querySelectorAll('button').forEach(b=>b.disabled=true);try{await action();}catch(error){if(error.userMessage)notice(error.userMessage);else if(session)notice('تعذر الاتصال. المعروض هو آخر ملخص مستلم، وليس بيانات لحظية.');else notice('تعذر الدخول؛ راجع الحساب وتأكيد البريد والاتصال.');}finally{document.querySelectorAll('button').forEach(b=>b.disabled=false);if(!configured)$('login-button').disabled=$('signup').disabled=true;}}
+function mode(signup){creating=signup;$('confirm-password-row').hidden=!signup;$('confirm-password').required=signup;$('password').autocomplete=signup?'new-password':'current-password';$('login-button').textContent=signup?'إنشاء الحساب':'دخول';$('signup').textContent=signup?'عندي حساب: تسجيل الدخول':'إنشاء حساب جديد';$('password').value=$('confirm-password').value='';notice(signup?'اختَر كلمة مرور جديدة لهذا الحساب، ثم اكتبها مرة ثانية.':'');}
+$('signup').onclick=()=>mode(!creating);
+const returnUrl=location.origin+location.pathname;
+$('login-form').addEventListener('submit',e=>{e.preventDefault();guard(async()=>{
+ if(creating){if($('password').value!==$('confirm-password').value){notice('كلمتا المرور غير متطابقتين.');return;}const value=await request('/auth/v1/signup?redirect_to='+encodeURIComponent(returnUrl),{email:$('email').value.trim(),password:$('password').value});mode(false);if(value.access_token){await signedIn(value);return;}notice('راجع بريدك لتأكيد الحساب. لو البريد مسجل من قبل، استخدم «نسيت كلمة المرور»؛ إعادة إنشاء الحساب لا تغيّر كلمة مروره.');return;}
+ const value=await request('/auth/v1/token?grant_type=password',{email:$('email').value.trim(),password:$('password').value});notice('');await signedIn(value);
+});});
+$('forgot').onclick=()=>guard(async()=>{if(!$('email').reportValidity())return;await request('/auth/v1/recover?redirect_to='+encodeURIComponent(returnUrl),{email:$('email').value.trim()});$('password').value='';notice('لو البريد مسجل، ستصلك رسالة لتعيين كلمة مرور جديدة. افتح أحدث رسالة فقط.');});
+$('recovery-form').addEventListener('submit',e=>{e.preventDefault();guard(async()=>{if(!recovery){notice('افتح رابط استعادة جديد من بريدك.');return;}if($('new-password').value!==$('repeat-password').value){notice('كلمتا المرور غير متطابقتين.');return;}session=recovery;let revoked=false;try{await request('/auth/v1/user',{password:$('new-password').value},true,'PUT');try{await request('/auth/v1/logout?scope=global',{},true);revoked=true;}catch{}}finally{session=null;}clear();mode(false);$('new-password').value=$('repeat-password').value='';notice(revoked?'تم تغيير كلمة المرور وإلغاء الجلسات السابقة. سجّل الدخول بكلمة المرور الجديدة.':'تم تغيير كلمة المرور. سجّل الدخول بالجديدة؛ تعذر تأكيد إلغاء الجلسات السابقة.');});});
+$('cancel-recovery').onclick=()=>{clear();mode(false);};
+async function finishCallback(){if(callback.get('error')){notice('رابط البريد انتهى أو استُخدم. لو أكدت بريدك سابقًا، سجّل الدخول أو استخدم نسيت كلمة المرور.');return;}if(callback.get('type')!=='recovery'){if(callback.get('access_token'))notice('تم تأكيد البريد. سجّل الدخول بكلمة المرور التي اخترتها عند إنشاء الحساب.');return;}const token=callback.get('access_token');if(!token){notice('رابط استعادة غير مكتمل؛ اطلب رسالة جديدة.');return;}recovery={access_token:token,refresh_token:callback.get('refresh_token'),expires_at:Date.now()+3600000};session=recovery;try{await request('/auth/v1/user',undefined,true);session=null;$('login').hidden=true;$('recovery').hidden=false;notice('اختَر كلمة مرور جديدة لحسابك.');}catch{clear();notice('رابط الاستعادة غير صالح أو انتهى؛ اطلب رسالة جديدة.');}}
+
 $('approve').onclick=()=>guard(async()=>{if(!pairing||!$('shop-name').value.trim())return;if(!confirm('ربط هذا الجهاز بحساب مطبعتك وإيقاف أي جهاز رئيسي سابق؟'))return;await request('/rest/v1/rpc/printa_approve',{shop_name:$('shop-name').value.trim(),device_hash:pairing},true);pairing=null;$('pair').hidden=true;await refresh();notice('تم ربط الحساب. ارجع إلى Printa واضغط «تأكيد الحساب وإكمال الربط» لبدء إرسال الملخصات.');});
 async function refresh(){
  if(!session||polling)return;polling=true;
@@ -52,3 +64,5 @@ $('revoke').onclick=()=>guard(async()=>{if(!confirm('إيقاف استقبال �
 setInterval(()=>{if(session&&!document.hidden)refresh().catch(()=>{if(snapshot)render();notice('الاتصال متوقف؛ راجع وقت آخر مزامنة.');});},60000);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&session)refresh().catch(()=>notice('تعذر تحديث البيانات.'));});
 if(!configured){notice('صفحة المتابعة لم تُربط بالخدمة بعد. لا توجد بيانات تجريبية معروضة.');$('login-button').disabled=$('signup').disabled=true;}
+
+if(configured)finishCallback();
