@@ -1,4 +1,5 @@
-import {period,freshness} from './report.js';
+import {renderOrders,clearOrders} from './orders.js?v=74';
+import {period,freshness} from './report.js?v=74';
 const $=id=>document.getElementById(id),config=window.PRINTA_MOBILE||{};
 let session=null,shop=null,snapshot=null,received=null,polling=false;
 const callback=new URLSearchParams(location.hash.slice(1));
@@ -9,7 +10,7 @@ if(pairing&&!/^[a-f0-9]{64}$/.test(pairing))pairing=null;
 const endpoint=String(config.endpoint||'').replace(/\/$/,'');
 const configured=(()=>{try{return new URL(endpoint).protocol==='https:'&&!!config.publishableKey}catch{return false}})();
 function notice(text){$('notice').textContent=text;}
-function clear(){session=null;shop=null;snapshot=null;received=null;$('metrics').replaceChildren();$('trend').replaceChildren();$('dashboard').hidden=$('account').hidden=$('pair').hidden=true;$('login').hidden=false;$('password').value='';$('recovery').hidden=true;recovery=null;}
+function clear(){clearOrders();session=null;shop=null;snapshot=null;received=null;$('metrics').replaceChildren();$('trend').replaceChildren();$('dashboard').hidden=$('account').hidden=$('pair').hidden=true;$('login').hidden=false;$('password').value='';$('recovery').hidden=true;recovery=null;}
 async function request(path,body,auth=false,method=body===undefined?'GET':'POST'){
  const headers={apikey:config.publishableKey,'Content-Type':'application/json'};
  if(auth){if(!session)throw Error('auth');headers.Authorization='Bearer '+session.access_token;}
@@ -37,10 +38,10 @@ async function refresh(){
  try{
   if(Date.now()>session.expires_at-60000){const value=await request('/auth/v1/token?grant_type=refresh_token',{refresh_token:session.refresh_token});session={...value,expires_at:Date.now()+value.expires_in*1000};}
   const shops=await request('/rest/v1/printa_shops?select=id,name',undefined,true);
-  if(!shops.length){shop=null;snapshot=null;$('dashboard').hidden=true;$('metrics').replaceChildren();$('trend').replaceChildren();notice(pairing?'أكّد الربط أدناه.':'افتح «متابعة الموبايل» من البرنامج لربط حسابك.');return;}
+  if(!shops.length){shop=null;snapshot=null;clearOrders();$('dashboard').hidden=true;$('metrics').replaceChildren();$('trend').replaceChildren();notice(pairing?'أكّد الربط أدناه.':'افتح «متابعة الموبايل» من البرنامج لربط حسابك.');return;}
   shop=shops[0];$('shop-title').textContent=shop.name;$('shop-name').value=shop.name;
   const rows=await request('/rest/v1/printa_snapshots?select=received_at,payload&shop_id=eq.'+encodeURIComponent(shop.id),undefined,true);
-  if(!rows.length){snapshot=null;$('dashboard').hidden=true;$('metrics').replaceChildren();$('trend').replaceChildren();notice('في انتظار أول ملخص من الجهاز الرئيسي.');return;}
+  if(!rows.length){snapshot=null;clearOrders();$('dashboard').hidden=true;$('metrics').replaceChildren();$('trend').replaceChildren();notice('في انتظار أول ملخص من الجهاز الرئيسي.');return;}
   snapshot=rows[0].payload;received=rows[0].received_at;
   const from=$('from'),to=$('to');from.min=to.min=snapshot.days[0].date;from.max=to.max=snapshot.today;
   if(!from.value||from.value<from.min)from.value=snapshot.today;if(!to.value||to.value>to.max)to.value=snapshot.today;
@@ -49,6 +50,7 @@ async function refresh(){
 }
 function render(){
  if(!snapshot)return;const from=$('from').value,to=$('to').value;if(from>to){notice('اختر بداية قبل نهاية الفترة.');return;}
+ renderOrders(snapshot,from,to);
  const {days,totals:t,outstanding}=period(snapshot,from,to),money=n=>new Intl.NumberFormat('en-EG',{maximumFractionDigits:2}).format(n)+' ج';
  const cards=[['المبيعات',money(t.sales)],['العمليات',String(t.orders)],['صافي حركة الدرج',money(t.drawerBalance)],['نقدي مستلم',money(t.cash)],['تحويلات مستلمة',money(t.insta)],['المسدد لأوردرات الفترة',money(t.actualSales)],['متبقي أوردرات الفترة',money(t.pendingToday)],['تحصيل أوردرات سابقة',money(t.previousCollections)],['إضافات الدرج',money(t.additions)],['مسحوبات الدرج',money(t.withdrawals)],['إجمالي المتبقي الحالي',money(outstanding)]];
  $('metrics').replaceChildren(...cards.map(([label,value])=>{const div=document.createElement('div');div.className='metric';const span=document.createElement('span'),strong=document.createElement('strong');span.textContent=label;strong.textContent=value;div.append(span,strong);return div;}));

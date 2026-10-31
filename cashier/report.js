@@ -1,5 +1,5 @@
 export function period(snapshot,from,to){
- if(!snapshot||snapshot.schemaVersion!==1||!Array.isArray(snapshot.days))throw Error('unsupported');
+ if(!snapshot||![1,2].includes(snapshot.schemaVersion)||!Array.isArray(snapshot.days))throw Error('unsupported');
  const days=snapshot.days.filter(d=>d.date>=from&&d.date<=to);
  const fields=['orders','sales','actualSales','cash','insta','pendingToday','previousCollections','additions','withdrawals','collections','drawerBalance'];
  const totals=Object.fromEntries(fields.map(k=>[k,days.reduce((sum,d)=>sum+Number(d[k]||0),0)]));
